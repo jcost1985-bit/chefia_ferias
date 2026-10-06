@@ -30,14 +30,15 @@ table{width:100%;border-collapse:collapse;min-width:1100px}th,td{padding:12px 10
 </style>
 </head>
 <body>
-<header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • 06/10/2026</p></header>
+<header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • versão 2 • 06/10/2026</p></header>
 <main>
 <div class="toolbar">
+<div style="width:100%;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:10px;font-size:13px"><b>🔒 Seus dados são preservados:</b> as alterações ficam salvas neste navegador. Antes de substituir o arquivo no GitHub, use <b>Exportar backup</b> por segurança.</div>
 <button class="primary" onclick="openNew()">＋ Nova demanda</button>
 <button class="secondary" onclick="exportJSON()">Exportar backup</button>
 <button class="secondary" onclick="document.getElementById('importFile').click()">Importar backup</button>
 <input id="importFile" type="file" accept=".json" hidden onchange="importJSON(event)">
-<button class="secondary" onclick="resetData()">Restaurar demandas iniciais</button>
+
 </div>
 
 <section class="kpis">
@@ -154,7 +155,6 @@ function saveTask(){
 function deleteTask(id){if(confirm("Excluir esta demanda?")){tasks=tasks.filter(t=>t.id!==id);save();render()}}
 function exportJSON(){let blob=new Blob([JSON.stringify(tasks,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="backup-painel-cjp.json";a.click();URL.revokeObjectURL(a.href)}
 function importJSON(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{tasks=JSON.parse(r.result);save();render();alert("Backup importado.");}catch{alert("Arquivo inválido.")}};r.readAsText(f)}
-function resetData(){if(confirm("Restaurar as 14 demandas iniciais? Isso apagará as alterações locais.")){tasks=structuredClone(initialTasks);save();render()}}
 render();
 </script>
 </body>
