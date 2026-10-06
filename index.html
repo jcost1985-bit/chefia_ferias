@@ -36,99 +36,102 @@ table{width:100%;border-collapse:collapse;min-width:1100px}th,td{padding:12px 10
   td:nth-child(9)::before{content:"Última evolução • ";font-weight:700;color:var(--muted)}
 }
 
-/* ===== MOBILE / RESPONSIVE ===== */
-@media(max-width:900px){
-  header{padding:22px 18px}
-  header h1{font-size:23px}
-  header p{font-size:12px}
-  main{padding:0 12px}
-  .kpis{grid-template-columns:repeat(2, minmax(145px,1fr));overflow-x:auto}
-  .form-grid{grid-template-columns:1fr}
-  .field.full{grid-column:auto}
-  .toolbar{gap:8px}
-  .toolbar button{flex:1;min-width:145px}
-  .filters{padding:10px;gap:8px}
-  .filters input{min-width:100%;flex-basis:100%}
-  .filters select{flex:1;min-width:0}
-  .table-wrap{background:transparent;border:0;overflow:visible}
-  table{min-width:0;border-collapse:separate}
+
+/* ===== RESPONSIVE V3 — APP-LIKE MOBILE ===== */
+@media (max-width: 900px){
+  *{min-width:0}
+  body{overflow-x:hidden}
+  header{padding:20px 16px}
+  header h1{font-size:22px;line-height:1.15}
+  header p{font-size:12px;line-height:1.4}
+  main{width:100%;max-width:100%;padding:14px 12px 28px;margin:0}
+  .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .toolbar>div[style]{grid-column:1/-1}
+  .toolbar button{width:100%;min-height:44px;padding:9px 10px;font-size:12px}
+  .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}
+  .kpi{min-width:0;padding:12px;border-radius:12px}
+  .kpi small{font-size:10px;line-height:1.2}
+  .kpi strong{font-size:22px;line-height:1.1;margin-top:5px}
+  .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;margin-bottom:12px;border-radius:12px}
+  .filters input{grid-column:1/-1;min-width:0;width:100%;font-size:16px}
+  .filters select{min-width:0;width:100%;font-size:13px}
+  .table-wrap{overflow:visible;background:transparent;border:0;border-radius:0}
+  table{display:block;min-width:0;width:100%;border:0}
   thead{display:none}
-  tbody{display:grid;gap:10px}
+  tbody{display:grid;grid-template-columns:1fr;gap:10px;width:100%}
   tr{
+    width:100%;
+    min-width:0;
     display:grid;
-    grid-template-columns:1fr auto;
-    gap:0;
+    grid-template-columns:minmax(0,1fr) auto;
     background:#fff;
     border:1px solid var(--line);
-    border-radius:14px;
-    box-shadow:0 1px 2px #00000008;
+    border-radius:15px;
     overflow:hidden;
+    box-shadow:0 2px 8px rgba(16,24,40,.05);
   }
-  td{
-    display:none;
-    border:0;
-    padding:8px 12px;
-  }
-  td:nth-child(1){display:none}
+  td{display:none;border:0;min-width:0;overflow-wrap:anywhere;word-break:normal}
   td:nth-child(2){
-    display:block;
-    grid-column:1/-1;
-    padding:13px 12px 4px;
-    font-size:14px;
+    display:block;grid-column:1/-1;
+    padding:14px 12px 5px;
+    font-size:14px;line-height:1.3;
   }
-  td:nth-child(2) .muted{display:block;margin-top:4px;font-size:11px}
+  td:nth-child(2) b{display:block;overflow-wrap:anywhere}
+  td:nth-child(2) .muted{display:block;margin-top:5px;font-size:10px;line-height:1.35}
   td:nth-child(3){
-    display:block;
-    grid-column:1/-1;
-    padding:5px 12px 10px;
-    font-size:12px;
-    color:#475467;
+    display:block;grid-column:1/-1;
+    padding:5px 12px 12px;
+    font-size:12px;line-height:1.45;color:#475467;
   }
-  td:nth-child(4),td:nth-child(5),td:nth-child(6),td:nth-child(7),td:nth-child(8){
-    display:block;
-    padding:4px 6px 12px 12px;
-    font-size:11px;
+  td:nth-child(3)::before{
+    content:"PRÓXIMA AÇÃO";
+    display:block;margin-bottom:3px;font-size:9px;font-weight:800;letter-spacing:.06em;color:var(--muted);
   }
-  td:nth-child(4){grid-column:1/2}
-  td:nth-child(5){grid-column:2/3;text-align:right}
-  td:nth-child(6){grid-column:1/2}
-  td:nth-child(7){grid-column:2/3;text-align:right}
-  td:nth-child(8){grid-column:1/2}
-  td:nth-child(9){display:block;grid-column:1/-1;padding:8px 12px;border-top:1px solid var(--line);font-size:11px}
+  td:nth-child(4){display:block;grid-column:1/2;padding:6px 6px 12px 12px;font-size:11px;line-height:1.3}
+  td:nth-child(5){display:block;grid-column:2/3;padding:6px 12px 12px 6px;text-align:right;font-size:11px;line-height:1.3}
+  td:nth-child(6){display:block;grid-column:1/2;padding:0 6px 12px 12px;font-size:11px}
+  td:nth-child(7){display:block;grid-column:2/3;padding:0 12px 12px 6px;text-align:right;font-size:11px}
+  td:nth-child(8){display:block;grid-column:1/2;padding:0 6px 12px 12px;font-size:11px}
+  td:nth-child(9){display:block;grid-column:1/-1;padding:9px 12px;border-top:1px solid var(--line);font-size:10px;line-height:1.35;overflow-wrap:anywhere}
   td:nth-child(10){
-    display:flex;grid-column:2/3;grid-row:4/7;align-items:center;justify-content:flex-end;
-    padding:5px 8px 8px 0;
+    display:flex;grid-column:2/3;grid-row:5/8;align-items:flex-end;justify-content:flex-end;
+    padding:0 8px 8px 0;gap:4px
   }
-  td:nth-child(10) button{padding:7px}
-  .actions{flex-wrap:wrap}
-  .badge{font-size:10px;padding:4px 7px}
-  .days{font-size:11px}
-  .modal{padding:10px}
-  .modal-card{max-height:94vh;padding:16px;border-radius:14px}
+  td:nth-child(10) button{min-width:40px;min-height:40px;padding:6px}
+  td:nth-child(4)::before{content:"RESPONSÁVEL • ";font-weight:800;color:var(--muted)}
+  td:nth-child(5)::before{content:"PRAZO • ";font-weight:800;color:var(--muted)}
+  td:nth-child(6)::before{content:"TEMPO • ";font-weight:800;color:var(--muted)}
+  td:nth-child(7)::before{content:"PRIORIDADE • ";font-weight:800;color:var(--muted)}
+  td:nth-child(8)::before{content:"STATUS • ";font-weight:800;color:var(--muted)}
+  td:nth-child(9)::before{content:"ÚLTIMA EVOLUÇÃO • ";font-weight:800;color:var(--muted)}
+  .badge{font-size:10px;padding:4px 7px;max-width:100%;white-space:normal;text-align:center}
+  .modal{padding:8px;overflow:auto}
+  .modal-card{width:100%;max-width:100%;max-height:none;padding:16px;border-radius:15px}
+  .form-grid{display:grid;grid-template-columns:1fr;gap:10px}
+  .field.full{grid-column:auto}
+  .field input,.field select,.field textarea{width:100%;min-width:0;font-size:16px}
+  .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .modal-actions button{min-height:44px}
 }
-
-@media(max-width:550px){
-  .kpis{
-    display:flex;
-    overflow-x:auto;
-    gap:8px;
-    padding-bottom:4px;
-    scrollbar-width:none;
-  }
-  .kpis::-webkit-scrollbar{display:none}
-  .kpi{min-width:145px;padding:12px}
-  .kpi strong{font-size:23px}
-  header{padding:18px 14px}
-  header h1{font-size:20px}
-  main{padding:0 10px}
-  .toolbar button{min-width:0;padding:9px 10px;font-size:12px}
-  .filters select{font-size:12px}
+@media (max-width:480px){
+  header{padding:17px 13px}
+  header h1{font-size:19px}
+  main{padding:11px 9px 24px}
+  .kpis{gap:7px}
+  .kpi{padding:10px}
+  .kpi strong{font-size:20px}
+  .toolbar{grid-template-columns:1fr 1fr}
+  .filters{grid-template-columns:1fr 1fr;padding:8px}
+  tr{border-radius:13px}
+  td:nth-child(2){padding:13px 11px 4px;font-size:13px}
+  td:nth-child(3){padding:5px 11px 10px;font-size:11.5px}
+  td:nth-child(4),td:nth-child(5),td:nth-child(6),td:nth-child(7),td:nth-child(8){font-size:10px}
+  td:nth-child(9){padding:8px 11px;font-size:9.5px}
 }
-
 </style>
 </head>
 <body>
-<header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • versão 2.1 responsiva • 06/10/2026</p></header>
+<header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • versão 3 • responsivo • 06/10/2026</p></header>
 <main>
 <div class="toolbar">
 <div style="width:100%;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:10px;font-size:13px"><b>🔒 Seus dados são preservados:</b> as alterações ficam salvas neste navegador. Antes de substituir o arquivo no GitHub, use <b>Exportar backup</b> por segurança.</div>
