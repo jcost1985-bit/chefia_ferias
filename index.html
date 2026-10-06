@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel CJP</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#667085;--line:#e4e7ec;--blue:#2563eb;--red:#dc2626;--orange:#ea580c;--yellow:#ca8a04;--green:#16a34a;--purple:#7c3aed;--gray:#64748b}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#111827,#1e3a8a);color:#fff;padding:28px 5vw}
+header h1{margin:0;font-size:28px}header p{margin:6px 0 0;opacity:.8}
+main{max-width:1450px;margin:24px auto;padding:0 20px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+button,select,input,textarea{font:inherit}button{border:0;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:600}
+.primary{background:var(--blue);color:white}.secondary{background:white;border:1px solid var(--line);color:var(--text)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}.kpi small{color:var(--muted)}.kpi strong{display:block;font-size:27px;margin-top:5px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);padding:14px;border-radius:14px;margin-bottom:16px}
+.filters input{min-width:260px;flex:1}.filters select{min-width:150px}
+input,select,textarea{border:1px solid var(--line);border-radius:9px;padding:9px;background:#fff;color:var(--text)}
+.table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;min-width:1100px}th,td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-size:12px;text-transform:uppercase;color:var(--muted);background:#f8fafc;position:sticky;top:0;z-index:1}
+.badge{display:inline-flex;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}.alta{background:#fee2e2;color:#b91c1c}.media{background:#fef3c7;color:#92400e}.baixa{background:#dcfce7;color:#166534}.urgente{background:#dc2626;color:#fff}.normal{background:#dbeafe;color:#1d4ed8}.aguardando{background:#fef3c7;color:#92400e}.concluida{background:#dcfce7;color:#166534}.pendente{background:#fee2e2;color:#b91c1c}.avaliar{background:#ede9fe;color:#6d28d9}
+.days{font-weight:800}.overdue{color:#dc2626}.soon{color:#ea580c}.ok{color:#16a34a}
+.actions button{padding:6px 8px;margin:2px}.muted{color:var(--muted)}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.open{display:flex}.modal-card{background:#fff;border-radius:16px;max-width:760px;width:100%;max-height:90vh;overflow:auto;padding:22px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:700;color:var(--muted)}textarea{min-height:90px;resize:vertical}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.empty{text-align:center;padding:35px;color:var(--muted)}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
+@media(max-width:550px){.kpis{grid-template-columns:1fr}header{padding:22px 18px}main{padding:0 12px}}
+</style>
+</head>
+<body>
+<header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • 06/10/2026</p></header>
+<main>
+<div class="toolbar">
+<button class="primary" onclick="openNew()">＋ Nova demanda</button>
+<button class="secondary" onclick="exportJSON()">Exportar backup</button>
+<button class="secondary" onclick="document.getElementById('importFile').click()">Importar backup</button>
+<input id="importFile" type="file" accept=".json" hidden onchange="importJSON(event)">
+<button class="secondary" onclick="resetData()">Restaurar demandas iniciais</button>
+</div>
+
+<section class="kpis">
+<div class="kpi"><small>Total</small><strong id="kTotal">0</strong></div>
+<div class="kpi"><small>🔴 Urgentes</small><strong id="kUrgent">0</strong></div>
+<div class="kpi"><small>🔵 Em andamento</small><strong id="kProgress">0</strong></div>
+<div class="kpi"><small>🟡 Aguardando</small><strong id="kWait">0</strong></div>
+<div class="kpi"><small>🟢 Concluídas</small><strong id="kDone">0</strong></div>
+</section>
+
+<div class="filters">
+<input id="search" placeholder="🔎 Buscar demanda, responsável ou ação..." oninput="render()">
+<select id="statusFilter" onchange="render()"><option value="">Todos os status</option><option>Pendente</option><option>Em andamento</option><option>Aguardando</option><option>A avaliar</option><option>Concluída</option><option>Cancelada</option></select>
+<select id="priorityFilter" onchange="render()"><option value="">Todas prioridades</option><option>Urgente</option><option>Alta</option><option>Média</option><option>Baixa</option></select>
+</div>
+
+<div class="table-wrap">
+<table><thead><tr>
+<th>ID</th><th>Demanda</th><th>Próxima ação</th><th>Responsável</th><th>Prazo</th><th>Dias</th><th>Prioridade</th><th>Status</th><th>Última evolução</th><th></th>
+</tr></thead><tbody id="tbody"></tbody></table>
+</div>
+</main>
+
+<div class="modal" id="modal"><div class="modal-card">
+<h2 id="modalTitle">Nova demanda</h2>
+<div class="form-grid">
+<div class="field"><label>Demanda</label><input id="fName"></div>
+<div class="field"><label>Responsável</label><input id="fOwner"></div>
+<div class="field full"><label>Próxima ação</label><textarea id="fAction"></textarea></div>
+<div class="field"><label>Prazo</label><input id="fDue" type="date" onchange="previewPriority()"></div>
+<div class="field"><label>Status</label><select id="fStatus"><option>Pendente</option><option>Em andamento</option><option>Aguardando</option><option>A avaliar</option><option>Concluída</option><option>Cancelada</option></select></div>
+<div class="field"><label>Prioridade</label><select id="fPriority"><option>Automática</option><option>Urgente</option><option>Alta</option><option>Média</option><option>Baixa</option></select><small id="priorityHint" class="muted"></small></div>
+<div class="field"><label>Última evolução</label><input id="fEvolution" placeholder="Ex.: reunião realizada"></div>
+<div class="field full"><label>Observações</label><textarea id="fNotes"></textarea></div>
+</div>
+<div class="modal-actions"><button class="secondary" onclick="closeModal()">Cancelar</button><button class="primary" onclick="saveTask()">Salvar</button></div>
+</div></div>
+
+<script>
+const initialTasks=[
+{id:1,name:"DEFESO ELEITORAL",action:"Aguardar alinhamento/posicionamento da SECOM Governo",owner:"",due:"",status:"Aguardando",priority:"Automática",evolution:"",notes:"Manter tudo como está até novo posicionamento."},
+{id:2,name:"VIOLÊNCIA DOMÉSTICA — ASCOM GOVERNO",action:"Contatar Gabriel Brant e conferir andamento/demandas",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:""},
+{id:3,name:"DOCUMENTÁRIO — ELEIÇÕES",action:"Fechar versão final e iniciar divulgação",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:""},
+{id:4,name:"VÍDEO INSTITUCIONAL — IPMS",action:"Contato/reunião com Cap. Caldeira; avaliar roteiro e possibilidades; despachar com Diretor",owner:"",due:"",status:"Pendente",priority:"Automática",evolution:"",notes:""},
+{id:5,name:"TRANSFORMANDO A VIDA DOS MINEIROS",action:"Conferir andamento, produções e fechar entregas do interior",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:"ASCOM Governo + 6ª RPM + CJP."},
+{id:6,name:"APOIO SALA DE IMPRENSA — PVD + RECONHECIMENTO FACIAL",action:"Gravar e editar roteiros da Marcilene; acompanhar produções",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:""},
+{id:7,name:"PROJETO PRISMA",action:"Coordenar fluxo de divulgação/publicação/imprensa e aprimorar método",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:""},
+{id:8,name:"OBRA / REFORMA — REALOCAÇÃO CJP",action:"Avaliar espaços e viabilidade de realocação, especialmente no térreo",owner:"",due:"",status:"A avaliar",priority:"Automática",evolution:"",notes:"Verificar áreas que não serão desmanchadas agora."},
+{id:9,name:"ESTÚDIO / PODCAST",action:"Definir se a sala montada no 1º andar será mantida para podcasts",owner:"",due:"",status:"A avaliar",priority:"Automática",evolution:"",notes:""},
+{id:10,name:"ANIVERSÁRIO CJP",action:"Confirmar data e definir almoço/comemoração da equipe",owner:"",due:"2026-10-20",status:"Pendente",priority:"Automática",evolution:"",notes:"Data ainda precisa ser confirmada."},
+{id:11,name:"TRANSFERÊNCIA / TROCA DE MILITARES",action:"Mapear transferências, trocas e impactos na estrutura da CJP",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:""},
+{id:12,name:"PMMG MIRIM",action:"Preparar lançamento e materiais",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:"Lançamento após o 2º turno das eleições."},
+{id:13,name:"SÉRIE — PREVENÇÃO À VIOLÊNCIA DOMÉSTICA",action:"Dar continuidade à produção e aguardar final do defeso para publicar",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:"Dependente do final do defeso eleitoral."},
+{id:14,name:"TELEFONIA / IPHONE — SGT. DANIEL",action:"Transferir linha para iPhone e tentar obter mais um aparelho",owner:"",due:"",status:"Pendente",priority:"Automática",evolution:"",notes:""}
+];
+let tasks=JSON.parse(localStorage.getItem("cjpTasks")||"null")||initialTasks;
+let editingId=null;
+
+function today(){let d=new Date();d.setHours(0,0,0,0);return d}
+function daysLeft(due){if(!due)return null;let d=new Date(due+"T00:00:00");return Math.ceil((d-today())/86400000)}
+function autoPriority(t){
+ if(t.status==="Concluída"||t.status==="Cancelada") return "Baixa";
+ if(t.status==="Aguardando") return "Aguardando";
+ let d=daysLeft(t.due);
+ if(d===null)return "Média";
+ if(d<0||d<=2)return "Urgente";
+ if(d<=7)return "Alta";
+ if(d<=21)return "Média";
+ return "Baixa";
+}
+function fmtDate(x){if(!x)return "—";let [y,m,d]=x.split("-");return `${d}/${m}/${y}`}
+function priorityClass(p){return p.toLowerCase().replace("é","e")}
+function statusClass(s){return ({Pendente:"pendente","Em andamento":"normal",Aguardando:"aguardando","A avaliar":"avaliar",Concluída:"concluida",Cancelada:"muted"}[s]||"muted")}
+function save(){localStorage.setItem("cjpTasks",JSON.stringify(tasks))}
+function render(){
+ const q=document.getElementById("search").value.toLowerCase();
+ const sf=document.getElementById("statusFilter").value,pf=document.getElementById("priorityFilter").value;
+ const list=tasks.filter(t=>{
+   const p=autoPriority(t);
+   return (!q||[t.name,t.action,t.owner,t.evolution,t.notes].join(" ").toLowerCase().includes(q))&&(!sf||t.status===sf)&&(!pf||p===pf);
+ });
+ const tb=document.getElementById("tbody");tb.innerHTML="";
+ if(!list.length){tb.innerHTML='<tr><td colspan="10" class="empty">Nenhuma demanda encontrada.</td></tr>'}
+ list.forEach(t=>{
+   const p=autoPriority(t),d=daysLeft(t.due);
+   let dc=d===null?"":d<0?"overdue":d<=3?"soon":"ok";
+   let ds=d===null?"—":d<0?`${Math.abs(d)} dia(s) atrasado`:d===0?"Hoje":`${d} dia(s)`;
+   tb.innerHTML+=`<tr>
+   <td><b>${t.id}</b></td><td><b>${t.name}</b><br><span class="muted">${t.notes||""}</span></td>
+   <td>${t.action||"—"}</td><td>${t.owner||"—"}</td><td>${fmtDate(t.due)}</td>
+   <td class="days ${dc}">${ds}</td><td><span class="badge ${p==="Urgente"?"urgente":priorityClass(p)}">${p}</span></td>
+   <td><span class="badge ${statusClass(t.status)}">${t.status}</span></td>
+   <td>${t.evolution||"—"}</td><td class="actions"><button class="secondary" onclick="editTask(${t.id})">✏️</button><button class="secondary" onclick="deleteTask(${t.id})">🗑️</button></td>
+   </tr>`;
+ });
+ document.getElementById("kTotal").textContent=tasks.length;
+ document.getElementById("kUrgent").textContent=tasks.filter(t=>autoPriority(t)==="Urgente").length;
+ document.getElementById("kProgress").textContent=tasks.filter(t=>t.status==="Em andamento").length;
+ document.getElementById("kWait").textContent=tasks.filter(t=>t.status==="Aguardando").length;
+ document.getElementById("kDone").textContent=tasks.filter(t=>t.status==="Concluída").length;
+}
+function openNew(){editingId=null;clearForm();document.getElementById("modalTitle").textContent="Nova demanda";document.getElementById("modal").classList.add("open")}
+function editTask(id){let t=tasks.find(x=>x.id===id);editingId=id;document.getElementById("modalTitle").textContent="Editar demanda";document.getElementById("fName").value=t.name;document.getElementById("fOwner").value=t.owner;document.getElementById("fAction").value=t.action;document.getElementById("fDue").value=t.due;document.getElementById("fStatus").value=t.status;document.getElementById("fPriority").value=t.priority||"Automática";document.getElementById("fEvolution").value=t.evolution;document.getElementById("fNotes").value=t.notes;previewPriority();document.getElementById("modal").classList.add("open")}
+function clearForm(){["fName","fOwner","fAction","fDue","fEvolution","fNotes"].forEach(id=>document.getElementById(id).value="");document.getElementById("fStatus").value="Pendente";document.getElementById("fPriority").value="Automática";previewPriority()}
+function closeModal(){document.getElementById("modal").classList.remove("open")}
+function previewPriority(){let t={due:document.getElementById("fDue").value,status:document.getElementById("fStatus").value};document.getElementById("priorityHint").textContent="Sugestão automática: "+autoPriority(t)}
+function saveTask(){
+ let id=editingId||Math.max(0,...tasks.map(t=>t.id))+1;
+ let t={id,name:document.getElementById("fName").value.trim(),owner:document.getElementById("fOwner").value.trim(),action:document.getElementById("fAction").value.trim(),due:document.getElementById("fDue").value,status:document.getElementById("fStatus").value,priority:document.getElementById("fPriority").value,evolution:document.getElementById("fEvolution").value.trim(),notes:document.getElementById("fNotes").value.trim()};
+ if(!t.name){alert("Informe o nome da demanda.");return}
+ if(editingId) tasks=tasks.map(x=>x.id===editingId?t:x);else tasks.push(t);
+ save();closeModal();render();
+}
+function deleteTask(id){if(confirm("Excluir esta demanda?")){tasks=tasks.filter(t=>t.id!==id);save();render()}}
+function exportJSON(){let blob=new Blob([JSON.stringify(tasks,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="backup-painel-cjp.json";a.click();URL.revokeObjectURL(a.href)}
+function importJSON(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{tasks=JSON.parse(r.result);save();render();alert("Backup importado.");}catch{alert("Arquivo inválido.")}};r.readAsText(f)}
+function resetData(){if(confirm("Restaurar as 14 demandas iniciais? Isso apagará as alterações locais.")){tasks=structuredClone(initialTasks);save();render()}}
+render();
+</script>
+</body>
+</html>
