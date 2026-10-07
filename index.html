@@ -175,54 +175,59 @@ function fmtDate(x){if(!x)return "—";let [y,m,d]=x.split("-");return `${d}/${m
 function priorityClass(p){return p.toLowerCase().replace("é","e")}
 function statusClass(s){return ({Pendente:"pendente","Em andamento":"normal",Aguardando:"aguardando","A avaliar":"avaliar",Concluída:"concluida",Cancelada:"muted"}[s]||"muted")}
 function save(){
-  localStorage.setItem("cjpTasks",JSON.stringify(tasks));
-  localStorage.setItem("cjpDirty","1");
-  const st=document.getElementById("syncStatus");
-  if(st){
-    st.textContent="💾 Alterações salvas neste dispositivo — publique o dados.json para aparecer em outros dispositivos";
-    st.style.background="#fff7ed"; st.style.borderColor="#fed7aa"; st.style.color="#9a3412";
+  try{
+    localStorage.setItem("cjpTasks", JSON.stringify(tasks));
+    const s=document.getElementById("syncStatus");
+    if(s){
+      s.textContent="💾 Alterações salvas neste dispositivo";
+      s.style.background="#fff7ed";
+      s.style.borderColor="#fed7aa";
+      s.style.color="#9a3412";
+    }
+    return true;
+  }catch(e){
+    alert("Não foi possível salvar as alterações neste navegador.");
+    return false;
   }
 }
 
 async function loadPublishedData(){
-  const st=document.getElementById("syncStatus");
-  const dirty=localStorage.getItem("cjpDirty")==="1";
-  const cached=JSON.parse(localStorage.getItem("cjpTasks")||"null");
-
-  // Se este dispositivo tem alterações locais, elas NÃO podem ser sobrescritas
-  // pelo dados.json publicado até que o usuário escolha publicar.
-  if(dirty && Array.isArray(cached)){
-    tasks=cached;
-    st.textContent="💾 Alterações locais preservadas neste dispositivo";
-    st.style.background="#fff7ed"; st.style.borderColor="#fed7aa"; st.style.color="#9a3412";
-    render();
-    return;
-  }
+  const s=document.getElementById('syncStatus');
+  try{
+    const raw=localStorage.getItem("cjpTasks");
+    if(raw){
+      const local=JSON.parse(raw);
+      if(Array.isArray(local)){
+        tasks=local;
+        if(s){
+          s.textContent="💾 Dados salvos neste dispositivo";
+          s.style.background="#ecfdf3";
+          s.style.borderColor="#bbf7d0";
+          s.style.color="#166534";
+        }
+        render();
+        return;
+      }
+    }
+  }catch(e){}
 
   try{
     const r=await fetch("dados.json?v="+Date.now(),{cache:"no-store"});
-    if(!r.ok) throw new Error("dados.json não encontrado");
+    if(!r.ok) throw new Error();
     const d=await r.json();
-    if(!Array.isArray(d)) throw new Error("Formato inválido");
+    if(!Array.isArray(d)) throw new Error();
     tasks=d;
     localStorage.setItem("cjpTasks",JSON.stringify(tasks));
-    localStorage.removeItem("cjpDirty");
-    st.textContent="🌐 Dados publicados carregados";
-    st.style.background="#ecfdf3"; st.style.borderColor="#bbf7d0"; st.style.color="#166534";
+    if(s)s.textContent="🌐 Dados publicados carregados";
     render();
   }catch(e){
-    if(Array.isArray(cached)){
-      tasks=cached;
-      st.textContent="📱 Último dado salvo neste dispositivo";
-      render();
-    }else{
-      st.textContent="⚠️ Não foi possível carregar dados.json";
-      tasks=initialTasks;
-      render();
-    }
+    tasks=initialTasks;
+    render();
+    if(s)s.textContent="⚠️ Não foi possível carregar os dados publicados";
   }
 }
 function exportJSON(){
+  save();
   const blob=new Blob([JSON.stringify(tasks,null,2)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='dados.json'; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),500);
