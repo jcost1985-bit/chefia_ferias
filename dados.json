@@ -1,0 +1,156 @@
+[
+  {
+    "id": 1,
+    "name": "DEFESO ELEITORAL",
+    "owner": "CAP JC",
+    "action": "CONCLUÍDO - Ofício Circular SECOM/GAB nº. 22/2026 (Encerramento das vedações eleitorais à publicidade institucional – retorno das ações de comunicação)",
+    "due": "",
+    "status": "Concluída",
+    "priority": "Média",
+    "evolution": "",
+    "notes": ""
+  },
+  {
+    "id": 2,
+    "name": "VIOLÊNCIA DOMÉSTICA (SECOM)",
+    "owner": "CAP JC",
+    "action": "EM ANDAMENTO - Contato realizado junto ao Gabriel Brant (Links de Vídeos encaminhados)",
+    "due": "",
+    "status": "Em andamento",
+    "priority": "Automática",
+    "evolution": "",
+    "notes": ""
+  },
+  {
+    "id": 3,
+    "name": "DOCUMENTÁRIO (ELEIÇÕES)",
+    "owner": "HI-FI",
+    "action": "APROVAÇÃO - Vídeo Finalizado e aguardando validação do Alto Comando.",
+    "due": "",
+    "status": "Em andamento",
+    "priority": "Automática",
+    "evolution": "VALIDAÇÃO",
+    "notes": ""
+  },
+  {
+    "id": 4,
+    "name": "VÍDEO INSTITUCIONAL - IPMS",
+    "owner": "Adjunto",
+    "action": "Contato/reunião com Cap. Caldeira; avaliar roteiro e possibilidades; despachar com Diretor",
+    "due": "2026-11-05",
+    "status": "Pendente",
+    "priority": "Automática",
+    "evolution": "",
+    "notes": ""
+  },
+  {
+    "id": 5,
+    "name": "VIDA DOS MINEIROS (SECOM)",
+    "owner": "Adjunto",
+    "action": "Conferir andamento, produções e fechar entregas do interior.",
+    "due": "2026-10-20",
+    "status": "Em andamento",
+    "priority": "Automática",
+    "evolution": "",
+    "notes": ""
+  },
+  {
+    "id": 6,
+    "name": "APOIO SALA DE IMPRENSA (SECOM)",
+    "owner": "Adjunto",
+    "action": "Gravar e editar roteiros da Marcilene; acompanhar produções.",
+    "due": "2026-10-20",
+    "status": "Em andamento",
+    "priority": "Automática",
+    "evolution": "BRIEFING",
+    "notes": ""
+  },
+  {
+    "id": 7,
+    "name": "PROJETO PRISMA",
+    "owner": "LO-FI",
+    "action": "Coordenar fluxo de divulgação/publicação/imprensa e aprimorar método.",
+    "due": "",
+    "status": "Em andamento",
+    "priority": "Automática",
+    "evolution": "INICIADO",
+    "notes": ""
+  },
+  {
+    "id": 8,
+    "name": "OBRA / REFORMA  (REALOCAR CJP)",
+    "owner": "CAP JC",
+    "action": "Avaliar espaços e viabilidade de realocação, especialmente no térreo e verificar áreas que não serão desmanchadas agora.",
+    "due": "2026-10-09",
+    "status": "Pendente",
+    "priority": "Automática",
+    "evolution": "",
+    "notes": ""
+  },
+  {
+    "id": 9,
+    "name": "ESTÚDIO (PODCAST)",
+    "owner": "CAP JC",
+    "action": "Definir se a sala montada no 1º andar será mantida para podcasts",
+    "due": "2026-10-09",
+    "status": "Pendente",
+    "priority": "Automática",
+    "evolution": "",
+    "notes": ""
+  },
+  {
+    "id": 10,
+    "name": "ANIVERSÁRIO CJP",
+    "owner": "Adm",
+    "action": "Confirmar data e definir almoço/comemoração da equipe.",
+    "due": "2026-10-20",
+    "status": "Pendente",
+    "priority": "Automática",
+    "evolution": "",
+    "notes": ""
+  },
+  {
+    "id": 11,
+    "name": "TRANSFERÊNCIA (PERMUTA)",
+    "owner": "Adjunto",
+    "action": "Mapear transferências, trocas e impactos na estrutura da CJP.",
+    "due": "",
+    "status": "Em andamento",
+    "priority": "Alta",
+    "evolution": "",
+    "notes": ""
+  },
+  {
+    "id": 12,
+    "name": "PMMG MIRIM",
+    "owner": "",
+    "action": "Preparar lançamento e materiais.",
+    "due": "2026-10-30",
+    "status": "Em andamento",
+    "priority": "Automática",
+    "evolution": "EDIÇÃO",
+    "notes": ""
+  },
+  {
+    "id": 13,
+    "name": "VIOLÊNCIA DOMÉSTICA (SÉRIE)",
+    "owner": "HI-FI",
+    "action": "Dar continuidade à produção e aguardar final do defeso para publicar.",
+    "due": "2026-10-30",
+    "status": "Em andamento",
+    "priority": "Automática",
+    "evolution": "PLANEJAMENTO",
+    "notes": ""
+  },
+  {
+    "id": 14,
+    "name": "IPHONE (DTS)",
+    "owner": "Adjunto",
+    "action": "Transferir linha para iPhone e tentar obter mais um aparelho",
+    "due": "2026-10-07",
+    "status": "Em andamento",
+    "priority": "Automática",
+    "evolution": "",
+    "notes": ""
+  }
+]

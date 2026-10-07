@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel CJP</title>
+<title>Painel CJP — Responsivo</title>
 <style>
 :root{--bg:#f4f6fa;--card:#fff;--text:#172033;--muted:#667085;--line:#e4e7ec;--blue:#2563eb}
 *{box-sizing:border-box}
@@ -69,17 +69,51 @@ tbody td:nth-child(9)::before{content:"EVOLUÇÃO • ";font-weight:800;color:va
  tbody td:nth-child(9){font-size:7.5px}
  .modal{padding:8px}.modal-card{padding:15px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.field input,.field select,.field textarea{font-size:16px}.modal-actions{display:grid;grid-template-columns:1fr 1fr}
 }
+
+/* MOBILE FIRST */
+.sync-status{width:100%;padding:9px 11px;border-radius:10px;background:#eef6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:12px;font-weight:700}
+@media(max-width:699px){
+  header{padding:18px 14px!important}
+  header h1{font-size:22px!important;line-height:1.15}
+  header p{font-size:12px!important;line-height:1.35}
+  main{padding:0 10px 30px!important}
+  .toolbar{gap:8px!important}
+  .toolbar button{min-height:44px;font-size:14px}
+  .filters{display:grid!important;grid-template-columns:1fr!important;gap:8px!important}
+  .filters input,.filters select{width:100%;min-height:44px;font-size:16px!important}
+  .table-wrap{overflow:visible!important}
+  table,thead,tbody,tr,th,td{display:block}
+  thead{display:none}
+  tbody tr{background:#fff;border:1px solid #e5e7eb;border-radius:14px;margin-bottom:10px;padding:12px;box-shadow:0 2px 8px rgba(15,23,42,.05)}
+  tbody td{border:0!important;padding:5px 0!important;display:grid!important;grid-template-columns:92px 1fr;gap:8px;font-size:13px!important;line-height:1.35}
+  tbody td:before{content:attr(data-label);font-weight:800;color:#667085;font-size:10px;text-transform:uppercase}
+  tbody td:nth-child(1){display:none!important}
+  tbody td:nth-child(2){display:block!important;padding-bottom:8px!important;border-bottom:1px solid #eef0f2!important}
+  tbody td:nth-child(2):before{display:none}
+  tbody td:nth-child(2) strong{font-size:16px}
+  tbody td:last-child{display:flex!important;justify-content:flex-end;gap:6px;padding-top:9px!important}
+  tbody td:last-child:before{display:none}
+  .actions button{min-height:38px;padding:7px 10px}
+  .modal{padding:8px!important}
+  .modal-card{padding:16px!important;border-radius:16px}
+  .form-grid{grid-template-columns:1fr!important}
+  .field.full{grid-column:auto!important}
+  .field input,.field select,.field textarea{font-size:16px!important;min-height:44px}
+  .modal-actions{display:grid!important;grid-template-columns:1fr 1fr}
+}
+
 </style>
 </head>
 <body>
 <header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • versão 2 • 06/10/2026</p></header>
 <main>
 <div class="toolbar">
-<div style="width:100%;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:10px;font-size:13px"><b>🔒 Seus dados são preservados:</b> as alterações ficam salvas neste navegador. Antes de substituir o arquivo no GitHub, use <b>Exportar backup</b> por segurança.</div>
+<div style="width:100%;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:10px;font-size:13px"><b>🔒 Seus dados são preservados:</b> o PC publica o arquivo <b>dados.json</b>; celular e PC usam os mesmos dados publicados.</div>
 <button class="primary" onclick="openNew()">＋ Nova demanda</button>
-<button class="secondary" onclick="exportJSON()">Exportar backup</button>
-<button class="secondary" onclick="document.getElementById('importFile').click()">Importar backup</button>
+<button class="secondary" onclick="exportJSON()">Baixar dados.json</button>
+<button class="secondary" onclick="document.getElementById('importFile').click()">Importar dados</button>
 <input id="importFile" type="file" accept=".json" hidden onchange="importJSON(event)">
+<div id="syncStatus" class="sync-status">🌐 Carregando dados publicados…</div>
 
 </div>
 
@@ -121,22 +155,7 @@ tbody td:nth-child(9)::before{content:"EVOLUÇÃO • ";font-weight:800;color:va
 </div></div>
 
 <script>
-const initialTasks=[
-{id:1,name:"DEFESO ELEITORAL",action:"Aguardar alinhamento/posicionamento da SECOM Governo",owner:"",due:"",status:"Aguardando",priority:"Automática",evolution:"",notes:"Manter tudo como está até novo posicionamento."},
-{id:2,name:"VIOLÊNCIA DOMÉSTICA — ASCOM GOVERNO",action:"Contatar Gabriel Brant e conferir andamento/demandas",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:""},
-{id:3,name:"DOCUMENTÁRIO — ELEIÇÕES",action:"Fechar versão final e iniciar divulgação",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:""},
-{id:4,name:"VÍDEO INSTITUCIONAL — IPMS",action:"Contato/reunião com Cap. Caldeira; avaliar roteiro e possibilidades; despachar com Diretor",owner:"",due:"",status:"Pendente",priority:"Automática",evolution:"",notes:""},
-{id:5,name:"TRANSFORMANDO A VIDA DOS MINEIROS",action:"Conferir andamento, produções e fechar entregas do interior",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:"ASCOM Governo + 6ª RPM + CJP."},
-{id:6,name:"APOIO SALA DE IMPRENSA — PVD + RECONHECIMENTO FACIAL",action:"Gravar e editar roteiros da Marcilene; acompanhar produções",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:""},
-{id:7,name:"PROJETO PRISMA",action:"Coordenar fluxo de divulgação/publicação/imprensa e aprimorar método",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:""},
-{id:8,name:"OBRA / REFORMA — REALOCAÇÃO CJP",action:"Avaliar espaços e viabilidade de realocação, especialmente no térreo",owner:"",due:"",status:"A avaliar",priority:"Automática",evolution:"",notes:"Verificar áreas que não serão desmanchadas agora."},
-{id:9,name:"ESTÚDIO / PODCAST",action:"Definir se a sala montada no 1º andar será mantida para podcasts",owner:"",due:"",status:"A avaliar",priority:"Automática",evolution:"",notes:""},
-{id:10,name:"ANIVERSÁRIO CJP",action:"Confirmar data e definir almoço/comemoração da equipe",owner:"",due:"2026-10-20",status:"Pendente",priority:"Automática",evolution:"",notes:"Data ainda precisa ser confirmada."},
-{id:11,name:"TRANSFERÊNCIA / TROCA DE MILITARES",action:"Mapear transferências, trocas e impactos na estrutura da CJP",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:""},
-{id:12,name:"PMMG MIRIM",action:"Preparar lançamento e materiais",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:"Lançamento após o 2º turno das eleições."},
-{id:13,name:"SÉRIE — PREVENÇÃO À VIOLÊNCIA DOMÉSTICA",action:"Dar continuidade à produção e aguardar final do defeso para publicar",owner:"",due:"",status:"Em andamento",priority:"Automática",evolution:"",notes:"Dependente do final do defeso eleitoral."},
-{id:14,name:"TELEFONIA / IPHONE — SGT. DANIEL",action:"Transferir linha para iPhone e tentar obter mais um aparelho",owner:"",due:"",status:"Pendente",priority:"Automática",evolution:"",notes:""}
-];
+const initialTasks = [];
 let tasks=JSON.parse(localStorage.getItem("cjpTasks")||"null")||initialTasks;
 let editingId=null;
 
@@ -156,6 +175,49 @@ function fmtDate(x){if(!x)return "—";let [y,m,d]=x.split("-");return `${d}/${m
 function priorityClass(p){return p.toLowerCase().replace("é","e")}
 function statusClass(s){return ({Pendente:"pendente","Em andamento":"normal",Aguardando:"aguardando","A avaliar":"avaliar",Concluída:"concluida",Cancelada:"muted"}[s]||"muted")}
 function save(){localStorage.setItem("cjpTasks",JSON.stringify(tasks))}
+
+async function loadPublishedData(){
+  const s=document.getElementById('syncStatus');
+  try{
+    const r=await fetch('dados.json?v='+Date.now(),{cache:'no-store'});
+    if(!r.ok) throw new Error('dados.json não encontrado');
+    const d=await r.json();
+    if(!Array.isArray(d)) throw new Error('Formato inválido');
+    tasks=d;
+    localStorage.setItem('cjpTasks',JSON.stringify(tasks));
+    s.textContent='🌐 Dados publicados carregados';
+    s.style.background='#ecfdf3'; s.style.borderColor='#bbf7d0'; s.style.color='#166534';
+    render();
+  }catch(e){
+    const cached=JSON.parse(localStorage.getItem('cjpTasks')||'null');
+    if(Array.isArray(cached)&&cached.length){
+      tasks=cached; s.textContent='📱 Último dado salvo neste dispositivo'; render();
+    }else{
+      s.textContent='⚠️ Não foi possível carregar dados.json'; tasks=initialTasks; render();
+    }
+  }
+}
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(tasks,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='dados.json'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),500);
+  const s=document.getElementById('syncStatus');
+  if(s)s.textContent='💾 dados.json baixado — substitua o arquivo no GitHub para publicar as alterações';
+}
+function importJSON(e){
+  const f=e.target.files?.[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const d=JSON.parse(rd.result);
+      if(!Array.isArray(d))throw new Error('O arquivo precisa conter uma lista de demandas.');
+      tasks=d; localStorage.setItem('cjpTasks',JSON.stringify(tasks)); render();
+      document.getElementById('syncStatus').textContent='📥 Dados importados. Baixe o dados.json para publicar.';
+    }catch(err){alert('Não foi possível importar: '+err.message)}
+  };
+  rd.readAsText(f);
+}
+
 function render(){
  const q=document.getElementById("search").value.toLowerCase();
  const sf=document.getElementById("statusFilter").value,pf=document.getElementById("priorityFilter").value;
@@ -210,6 +272,17 @@ function deleteTask(id){if(confirm("Excluir esta demanda?")){tasks=tasks.filter(
 function exportJSON(){let blob=new Blob([JSON.stringify(tasks,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="backup-painel-cjp.json";a.click();URL.revokeObjectURL(a.href)}
 function importJSON(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{tasks=JSON.parse(r.result);save();render();alert("Backup importado.");}catch{alert("Arquivo inválido.")}};r.readAsText(f)}
 render();
+
+const _renderPanel=render;
+render=function(){
+  _renderPanel();
+  document.querySelectorAll('tbody tr').forEach(tr=>{
+    ['ID','Demanda','Próxima ação','Responsável','Prazo','Dias','Prioridade','Status','Última evolução','Ações']
+    .forEach((x,i)=>{if(tr.children[i])tr.children[i].setAttribute('data-label',x)});
+  });
+};
+
 </script>
+<script>window.addEventListener("DOMContentLoaded",loadPublishedData);</script>
 </body>
 </html>
