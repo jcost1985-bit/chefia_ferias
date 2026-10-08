@@ -147,30 +147,8 @@
     "name": "IPHONE (DTS)",
     "owner": "Adjunto",
     "action": "Transferir linha para iPhone e tentar obter mais um aparelho",
-    "due": "2026-10-07",
+    "due": "2026-10-08",
     "status": "Em andamento",
-    "priority": "Automática",
-    "evolution": "",
-    "notes": ""
-  },
-  {
-    "id": 15,
-    "name": "TESTE",
-    "owner": "DSÇ,DLASM",
-    "action": "LKLLK",
-    "due": "",
-    "status": "Pendente",
-    "priority": "Automática",
-    "evolution": "",
-    "notes": ""
-  },
-  {
-    "id": 16,
-    "name": "asdasdasd",
-    "owner": "",
-    "action": "daasdas",
-    "due": "",
-    "status": "Pendente",
     "priority": "Automática",
     "evolution": "",
     "notes": ""
