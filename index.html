@@ -102,6 +102,19 @@ tbody td:nth-child(9)::before{content:"EVOLUÇÃO • ";font-weight:800;color:va
   .modal-actions{display:grid!important;grid-template-columns:1fr 1fr}
 }
 
+
+.github-config{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:12px;z-index:50}
+.github-config.open{display:flex}
+.github-config-card{background:#fff;width:min(560px,100%);max-height:92vh;overflow:auto;border-radius:18px;padding:20px;box-shadow:0 20px 60px #0003}
+.github-config-card h2{margin:0 0 8px;font-size:20px}
+.github-config-card p{font-size:13px;line-height:1.45;color:#667085}
+.github-field{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+.github-field label{font-size:12px;font-weight:800;color:#475467}
+.github-field input{min-height:44px;border:1px solid #d0d5dd;border-radius:10px;padding:10px;font-size:16px}
+.github-config-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+.github-ok{background:#ecfdf3;border:1px solid #bbf7d0;color:#166534;padding:10px;border-radius:10px;font-size:12px}
+@media(max-width:699px){.github-config-card{padding:16px}.github-config-actions{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -110,10 +123,10 @@ tbody td:nth-child(9)::before{content:"EVOLUÇÃO • ";font-weight:800;color:va
 <div class="toolbar">
 <div style="width:100%;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:10px;font-size:13px"><b>🔒 Seus dados são preservados:</b> o PC publica o arquivo <b>dados.json</b>; celular e PC usam os mesmos dados publicados.</div>
 <button class="primary" onclick="openNew()">＋ Nova demanda</button>
-<button class="primary" onclick="publicarAtualizacoes()">🚀 PUBLICAR ATUALIZAÇÕES</button>
+<button class="secondary" onclick="exportJSON()">Baixar dados.json</button>
 <button class="secondary" onclick="document.getElementById('importFile').click()">Importar dados</button>
 <input id="importFile" type="file" accept=".json" hidden onchange="importJSON(event)">
-<div class="publish-help" style="width:100%;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:10px 12px;border-radius:10px;font-size:12px"><b>Banco de dados do painel:</b> o arquivo <b>dados.json</b> contém todas as demandas. Use <b>🚀 PUBLICAR ATUALIZAÇÕES</b> para gerar a versão que será enviada ao GitHub.</div><div id="syncStatus" class="sync-status">🌐 Carregando dados publicados…</div>
+<div id="syncStatus" class="sync-status">🌐 Carregando dados publicados…</div>
 
 </div>
 
@@ -334,5 +347,45 @@ render=function(){
 
 </script>
 <script>window.addEventListener("DOMContentLoaded",loadPublishedData);</script>
+
+<div id="githubConfig" class="github-config">
+  <div class="github-config-card">
+    <h2>⚙️ Publicação no GitHub</h2>
+    <p>
+      Configure uma vez. O painel usará a API oficial do GitHub para substituir
+      automaticamente o <b>dados.json</b> no seu repositório quando você clicar em
+      <b>🚀 PUBLICAR ATUALIZAÇÕES</b>.
+    </p>
+    <div class="github-ok">
+      <b>Segurança:</b> use um token Fine-grained limitado a este repositório e somente
+      com <b>Contents → Read and write</b>. Não coloque o token no código do site.
+    </div>
+    <div class="github-field">
+      <label>Token Fine-grained do GitHub</label>
+      <input id="ghToken" type="password" placeholder="github_pat_...">
+    </div>
+    <div class="github-field">
+      <label>Owner / usuário</label>
+      <input id="ghOwner" value="jcost1985-bit">
+    </div>
+    <div class="github-field">
+      <label>Repositório</label>
+      <input id="ghRepo" value="chefia_ferias">
+    </div>
+    <div class="github-field">
+      <label>Branch</label>
+      <input id="ghBranch" value="main">
+    </div>
+    <div class="github-field">
+      <label>Arquivo de dados</label>
+      <input id="ghPath" value="dados.json">
+    </div>
+    <div class="github-config-actions">
+      <button class="secondary" onclick="fecharConfigGitHub()">Cancelar</button>
+      <button class="primary" onclick="salvarConfigGitHub()">Salvar configuração</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
