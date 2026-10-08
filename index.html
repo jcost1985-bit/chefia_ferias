@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel CJP — Responsivo</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--text:#172033;--muted:#667085;--line:#e4e7ec;--blue:#2563eb}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;max-width:100%;overflow-x:hidden}
+body{font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#111827,#1e3a8a);color:#fff;padding:22px 4vw}
+header h1{margin:0;font-size:26px;line-height:1.15}header p{margin:5px 0 0;opacity:.8;font-size:12px}
+main{max-width:1500px;margin:18px auto;padding:0 18px 24px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+button,select,input,textarea{font:inherit}button{border:0;border-radius:9px;padding:9px 13px;cursor:pointer;font-weight:650}
+.primary{background:var(--blue);color:#fff}.secondary{background:#fff;border:1px solid var(--line);color:var(--text)}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-bottom:12px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 13px}.kpi small{color:var(--muted);font-size:10px}.kpi strong{display:block;font-size:23px;line-height:1;margin-top:4px}
+.filters{display:grid;grid-template-columns:minmax(220px,1fr) 170px 170px 210px;gap:8px;background:#fff;border:1px solid var(--line);padding:9px;border-radius:11px;margin-bottom:11px}
+.filters input,.filters select{width:100%;min-width:0}
+input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:8px;background:#fff;color:var(--text)}
+.table-wrap{background:transparent;border:0;overflow:visible}
+table{width:100%;border-collapse:separate;border-spacing:0}
+thead{display:none}
+tbody{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+tbody tr{display:grid;grid-template-columns:minmax(0,1fr) auto;width:100%;min-width:0;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(16,24,40,.045)}
+tbody td{min-width:0;border:0;overflow-wrap:anywhere}
+tbody td:nth-child(1){grid-column:1/2;padding:9px 0 0 11px;font-size:9px;color:var(--muted)}
+tbody td:nth-child(2){grid-column:1/-1;padding:1px 11px 5px;font-size:13px;line-height:1.2}
+tbody td:nth-child(2) .muted{display:block;margin-top:2px;font-size:9px;line-height:1.2;color:var(--muted);max-height:22px;overflow:hidden}
+tbody td:nth-child(3){grid-column:1/-1;padding:4px 11px 7px;font-size:10px;line-height:1.3;color:#475467;max-height:34px;overflow:hidden}
+tbody td:nth-child(3)::before{content:"PRÓXIMA AÇÃO • ";font-size:8px;font-weight:800;color:var(--muted)}
+tbody td:nth-child(4){grid-column:1/2;padding:4px 4px 6px 11px;font-size:9px;line-height:1.15}
+tbody td:nth-child(5){grid-column:2/3;padding:4px 11px 6px 4px;text-align:right;font-size:9px;line-height:1.15}
+tbody td:nth-child(6){grid-column:1/2;padding:0 4px 6px 11px;font-size:9px;line-height:1.15}
+tbody td:nth-child(7){grid-column:2/3;padding:0 11px 6px 4px;text-align:right;font-size:9px;line-height:1.15}
+tbody td:nth-child(8){grid-column:1/2;padding:0 4px 7px 11px;font-size:9px;line-height:1.15}
+tbody td:nth-child(9){grid-column:1/2;padding:0 4px 7px 11px;font-size:8.5px;line-height:1.15;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+tbody td:nth-child(10){display:flex;grid-column:2/3;grid-row:5/7;align-items:flex-end;justify-content:flex-end;padding:0 8px 7px 4px;gap:3px}
+tbody td:nth-child(10) button{min-width:32px;min-height:32px;width:32px;height:32px;padding:3px;font-size:11px}
+tbody td:nth-child(4)::before{content:"RESP. • ";font-weight:800;color:var(--muted)}
+tbody td:nth-child(5)::before{content:"PRAZO • ";font-weight:800;color:var(--muted)}
+tbody td:nth-child(6)::before{content:"TEMPO • ";font-weight:800;color:var(--muted)}
+tbody td:nth-child(7)::before{content:"PRIORIDADE • ";font-weight:800;color:var(--muted)}
+tbody td:nth-child(8)::before{content:"STATUS • ";font-weight:800;color:var(--muted)}
+tbody td:nth-child(9)::before{content:"EVOLUÇÃO • ";font-weight:800;color:var(--muted)}
+.badge{display:inline-flex;padding:3px 6px;border-radius:999px;font-size:8px;font-weight:750;white-space:nowrap}
+.alta{background:#fee2e2;color:#b91c1c}.media{background:#fef3c7;color:#92400e}.baixa{background:#dcfce7;color:#166534}.urgente{background:#dc2626;color:#fff}.normal{background:#dbeafe;color:#1d4ed8}.aguardando{background:#fef3c7;color:#92400e}.concluida{background:#dcfce7;color:#166534}.pendente{background:#fee2e2;color:#b91c1c}.avaliar{background:#ede9fe;color:#6d28d9}
+.days{font-weight:800}.overdue{color:#dc2626}.soon{color:#ea580c}.ok{color:#16a34a}.muted{color:var(--muted)}
+.actions button{padding:6px 8px;margin:2px}.empty{text-align:center;padding:25px;color:var(--muted);grid-column:1/-1;background:#fff;border:1px solid var(--line);border-radius:12px}
+.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.open{display:flex}.modal-card{background:#fff;border-radius:15px;max-width:760px;width:100%;max-height:90vh;overflow:auto;padding:20px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}.field label{font-size:11px;font-weight:700;color:var(--muted)}textarea{min-height:90px;resize:vertical}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+@media(max-width:900px){
+ header{padding:18px 16px}header h1{font-size:22px}
+ main{padding:0 12px 20px;margin:14px auto}
+ .kpis{gap:5px}.kpi{padding:8px 5px;text-align:center}.kpi small{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.kpi strong{font-size:18px}
+ .filters{grid-template-columns:1fr 1fr}.filters input{grid-column:1/-1}.filters select:last-child{grid-column:1/-1}
+ tbody{grid-template-columns:1fr}
+}
+@media(max-width:550px){
+ header{padding:16px 12px}header h1{font-size:18px}header p{font-size:9px}
+ main{padding:0 8px 18px;margin:10px auto}
+ .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:6px}.toolbar button{width:100%;min-height:38px;padding:7px 5px;font-size:10px}
+ .kpis{gap:4px;margin-bottom:8px}.kpi{padding:7px 2px;border-radius:8px}.kpi small{font-size:7px}.kpi strong{font-size:16px}
+ .filters{padding:7px;gap:5px}.filters input{font-size:14px;padding:7px}.filters select{font-size:10px;padding:6px 4px}
+ tbody{gap:6px}
+ tbody td:nth-child(2){font-size:11px}tbody td:nth-child(3){font-size:9.5px}
+ tbody td:nth-child(4),tbody td:nth-child(5),tbody td:nth-child(6),tbody td:nth-child(7),tbody td:nth-child(8){font-size:8px}
+ tbody td:nth-child(9){font-size:7.5px}
+ .modal{padding:8px}.modal-card{padding:15px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.field input,.field select,.field textarea{font-size:16px}.modal-actions{display:grid;grid-template-columns:1fr 1fr}
+}
+
+/* MOBILE FIRST */
+.sync-status{width:100%;padding:9px 11px;border-radius:10px;background:#eef6ff;border:1px solid #bfdbfe;color:#1d4ed8;font-size:12px;font-weight:700}
+@media(max-width:699px){
+  header{padding:18px 14px!important}
+  header h1{font-size:22px!important;line-height:1.15}
+  header p{font-size:12px!important;line-height:1.35}
+  main{padding:0 10px 30px!important}
+  .toolbar{gap:8px!important}
+  .toolbar button{min-height:44px;font-size:14px}
+  .filters{display:grid!important;grid-template-columns:1fr!important;gap:8px!important}
+  .filters input,.filters select{width:100%;min-height:44px;font-size:16px!important}
+  .table-wrap{overflow:visible!important}
+  table,thead,tbody,tr,th,td{display:block}
+  thead{display:none}
+  tbody tr{background:#fff;border:1px solid #e5e7eb;border-radius:14px;margin-bottom:10px;padding:12px;box-shadow:0 2px 8px rgba(15,23,42,.05)}
+  tbody td{border:0!important;padding:5px 0!important;display:grid!important;grid-template-columns:92px 1fr;gap:8px;font-size:13px!important;line-height:1.35}
+  tbody td:before{content:attr(data-label);font-weight:800;color:#667085;font-size:10px;text-transform:uppercase}
+  tbody td:nth-child(1){display:none!important}
+  tbody td:nth-child(2){display:block!important;padding-bottom:8px!important;border-bottom:1px solid #eef0f2!important}
+  tbody td:nth-child(2):before{display:none}
+  tbody td:nth-child(2) strong{font-size:16px}
+  tbody td:last-child{display:flex!important;justify-content:flex-end;gap:6px;padding-top:9px!important}
+  tbody td:last-child:before{display:none}
+  .actions button{min-height:38px;padding:7px 10px}
+  .modal{padding:8px!important}
+  .modal-card{padding:16px!important;border-radius:16px}
+  .form-grid{grid-template-columns:1fr!important}
+  .field.full{grid-column:auto!important}
+  .field input,.field select,.field textarea{font-size:16px!important;min-height:44px}
+  .modal-actions{display:grid!important;grid-template-columns:1fr 1fr}
+}
+
+
+.publish-btn{font-weight:900!important}.system-bar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;padding:10px 12px;border-radius:10px;font-size:12px}.system-meta{display:flex;gap:14px;flex-wrap:wrap}.update-notice{display:none;background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:10px 12px;border-radius:10px;font-weight:800}.update-notice.show{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.confirm-overlay,.github-config{position:fixed;inset:0;background:rgba(15,23,42,.62);display:none;align-items:center;justify-content:center;padding:16px;z-index:1200}.confirm-overlay.open,.github-config.open{display:flex}.confirm-card,.github-config-card{width:min(500px,100%);background:#fff;border-radius:16px;padding:20px;box-shadow:0 24px 60px rgba(0,0,0,.25)}.confirm-card h3,.github-config-card h2{margin:0 0 10px}.confirm-card p,.github-config-card p{font-size:13px;line-height:1.5}.confirm-actions,.github-config-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}.github-field{margin-top:12px}.github-field label{display:block;font-size:12px;font-weight:800;margin-bottom:5px}.github-field input{width:100%;box-sizing:border-box;padding:10px;border:1px solid #cbd5e1;border-radius:9px}.github-ok{background:#ecfdf3;border:1px solid #bbf7d0;color:#166534;padding:10px;border-radius:10px;font-size:12px}
+@media(max-width:699px){.publish-btn{width:100%;min-height:46px}.system-meta{display:grid;gap:4px}.confirm-actions,.github-config-actions{display:grid;grid-template-columns:1fr 1fr}}
+</style>
+<meta name="app-version" content="2.5">
+</head>
+<body>
+<header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • versão 2.5 • 08/10/2026</p></header>
+<main>
+<div class="toolbar">
+<div style="width:100%;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:10px;font-size:13px"><b>🔒 Seus dados são preservados:</b> o PC publica o arquivo <b>dados.json</b>; celular e PC usam os mesmos dados publicados.</div>
+<div id="updateNotice" class="update-notice"><span>🆕 Nova versão do sistema disponível.</span><button class="primary" onclick="atualizarSistema()">🔄 ATUALIZAR SISTEMA</button></div>
+<div class="system-bar"><div class="system-meta"><strong id="systemVersion">🟢 SISTEMA ATUALIZADO • v2.5</strong><span id="publishedAt">Dados publicados: verificando…</span></div><button class="secondary" onclick="atualizarSistema()">🔄 Atualizar sistema</button></div>
+<button class="primary" onclick="openNew()">＋ Nova demanda</button>
+<button class="primary publish-btn" onclick="publicarAtualizacoes()">🚀 PUBLICAR ATUALIZAÇÕES</button>
+<button class="secondary" onclick="abrirConfigGitHub()">⚙️ GitHub</button>
+<button class="secondary" onclick="document.getElementById('importFile').click()">Importar dados</button>
+<input id="importFile" type="file" accept=".json" hidden onchange="importJSON(event)">
+<div id="syncStatus" class="sync-status">🌐 Carregando dados publicados…</div>
+
+</div>
+
+<section class="kpis">
+<div class="kpi"><small>Total</small><strong id="kTotal">0</strong></div>
+<div class="kpi"><small>🔴 Urgentes</small><strong id="kUrgent">0</strong></div>
+<div class="kpi"><small>🔵 Em andamento</small><strong id="kProgress">0</strong></div>
+<div class="kpi"><small>🟡 Aguardando</small><strong id="kWait">0</strong></div>
+<div class="kpi"><small>🟢 Concluídas</small><strong id="kDone">0</strong></div>
+</section>
+
+<div class="filters">
+<input id="search" placeholder="🔎 Buscar demanda, responsável ou ação..." oninput="render()">
+<select id="statusFilter" onchange="render()"><option value="">Todos os status</option><option>Pendente</option><option>Em andamento</option><option>Aguardando</option><option>A avaliar</option><option>Concluída</option><option>Cancelada</option></select>
+<select id="priorityFilter" onchange="render()"><option value="">Todas prioridades</option><option>Urgente</option><option>Alta</option><option>Média</option><option>Baixa</option></select>
+<select id="sortFilter" onchange="render()"><option value="urgency">Ordenar: mais prioritárias primeiro</option><option value="due">Prazo: mais próximo primeiro</option><option value="priority">Prioridade: Urgente → Baixa</option><option value="id">Ordem original</option></select>
+</div>
+
+<div class="table-wrap">
+<table><thead><tr>
+<th>ID</th><th>Demanda</th><th>Próxima ação</th><th>Responsável</th><th>Prazo</th><th>Dias</th><th>Prioridade</th><th>Status</th><th>Última evolução</th><th></th>
+</tr></thead><tbody id="tbody"></tbody></table>
+</div>
+</main>
+
+<div class="modal" id="modal"><div class="modal-card">
+<h2 id="modalTitle">Nova demanda</h2>
+<div class="form-grid">
+<div class="field"><label>Demanda</label><input id="fName"></div>
+<div class="field"><label>Responsável</label><input id="fOwner"></div>
+<div class="field full"><label>Próxima ação</label><textarea id="fAction"></textarea></div>
+<div class="field"><label>Prazo</label><input id="fDue" type="date" onchange="previewPriority()"></div>
+<div class="field"><label>Status</label><select id="fStatus"><option>Pendente</option><option>Em andamento</option><option>Aguardando</option><option>A avaliar</option><option>Concluída</option><option>Cancelada</option></select></div>
+<div class="field"><label>Prioridade</label><select id="fPriority"><option>Automática</option><option>Urgente</option><option>Alta</option><option>Média</option><option>Baixa</option></select><small id="priorityHint" class="muted"></small></div>
+<div class="field"><label>Última evolução</label><input id="fEvolution" placeholder="Ex.: reunião realizada"></div>
+<div class="field full"><label>Observações</label><textarea id="fNotes"></textarea></div>
+</div>
+<div class="modal-actions"><button class="secondary" onclick="closeModal()">Cancelar</button><button class="primary" onclick="saveTask()">Salvar</button></div>
+</div></div>
+
+<script>
+const initialTasks = [];
+let tasks=JSON.parse(localStorage.getItem("cjpTasks")||"null")||initialTasks;
+let editingId=null;
+
+function today(){let d=new Date();d.setHours(0,0,0,0);return d}
+function daysLeft(due){if(!due)return null;let d=new Date(due+"T00:00:00");return Math.ceil((d-today())/86400000)}
+function autoPriority(t){
+ if(t.status==="Concluída"||t.status==="Cancelada") return "Baixa";
+ if(t.status==="Aguardando") return "Aguardando";
+ let d=daysLeft(t.due);
+ if(d===null)return "Média";
+ if(d<0||d<=2)return "Urgente";
+ if(d<=7)return "Alta";
+ if(d<=21)return "Média";
+ return "Baixa";
+}
+function fmtDate(x){if(!x)return "—";let [y,m,d]=x.split("-");return `${d}/${m}/${y}`}
+function priorityClass(p){return p.toLowerCase().replace("é","e")}
+function statusClass(s){return ({Pendente:"pendente","Em andamento":"normal",Aguardando:"aguardando","A avaliar":"avaliar",Concluída:"concluida",Cancelada:"muted"}[s]||"muted")}
+function save(){
+  try{
+    localStorage.setItem("cjpTasks", JSON.stringify(tasks));
+    localStorage.setItem("cjpDirty", "1");
+    const s=document.getElementById("syncStatus");
+    if(s){
+      s.textContent="💾 Alterações salvas no PC — ainda não publicadas";
+      s.style.background="#fff7ed";
+      s.style.borderColor="#fed7aa";
+      s.style.color="#9a3412";
+    }
+    return true;
+  }catch(e){
+    alert("Não foi possível salvar as alterações neste navegador.");
+    return false;
+  }
+}
+
+async function loadPublishedData(){
+  const s=document.getElementById("syncStatus");
+  const dirty=localStorage.getItem("cjpDirty")==="1";
+
+  // Only keep local data if THIS device has unpublished edits.
+  if(dirty){
+    try{
+      const local=JSON.parse(localStorage.getItem("cjpTasks")||"null");
+      if(Array.isArray(local)){
+        tasks=local;
+        if(s){
+          s.textContent="💾 Alterações locais não publicadas";
+          s.style.background="#fff7ed";
+          s.style.borderColor="#fed7aa";
+          s.style.color="#9a3412";
+        }
+        render();
+        return;
+      }
+    }catch(e){}
+  }
+
+  // Otherwise, ALWAYS read the published GitHub data.
+  try{
+    const cfg=ghCfg();
+    // Leitura pública: sem headers personalizados para evitar preflight/CORS no navegador.
+    const r=await fetch(GITHUB_RAW_DATA_URL+"?ref="+encodeURIComponent(cfg.branch)+"&v="+Date.now(),{cache:"no-store"});
+    if(!r.ok) throw new Error("GitHub não respondeu (HTTP "+r.status+")");
+    const obj=await r.json();
+    if(!obj.content) throw new Error("GitHub não retornou o conteúdo de dados.json");
+    const binary=atob(obj.content.replace(/\n/g,""));
+    const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));
+    const d=JSON.parse(new TextDecoder("utf-8").decode(bytes));
+    if(!Array.isArray(d)) throw new Error("dados.json inválido");
+    tasks=d;
+    localStorage.setItem("cjpTasks",JSON.stringify(tasks));
+    localStorage.removeItem("cjpDirty");
+    if(s){
+      s.textContent="🌐 Dados publicados no GitHub";
+      s.style.background="#ecfdf3";
+      s.style.borderColor="#bbf7d0";
+      s.style.color="#166534";
+    }
+    render();
+  }catch(e){
+    // If GitHub cannot be reached, use the last local copy only as fallback.
+    try{
+      const local=JSON.parse(localStorage.getItem("cjpTasks")||"null");
+      if(Array.isArray(local)){ tasks=local; render(); }
+    }catch(x){}
+    if(s)s.textContent="⚠️ Não foi possível consultar os dados publicados";
+  }
+}
+function exportJSON(){
+  save();
+  const blob=new Blob([JSON.stringify(tasks,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='dados.json'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),500);
+  localStorage.removeItem('cjpDirty');
+  const st=document.getElementById('syncStatus');
+  if(st){
+    st.textContent='📤 dados.json baixado. Agora substitua o arquivo no GitHub para publicar as alterações.';
+    st.style.background='#eef6ff'; st.style.borderColor='#bfdbfe'; st.style.color='#1d4ed8';
+  }
+}
+function importJSON(e){
+  const f=e.target.files?.[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const d=JSON.parse(rd.result);
+      if(!Array.isArray(d))throw new Error('O arquivo precisa conter uma lista de demandas.');
+      tasks=d; localStorage.setItem('cjpTasks',JSON.stringify(tasks)); localStorage.setItem('cjpDirty','1'); render();
+      document.getElementById('syncStatus').textContent='📥 Dados importados. Baixe o dados.json para publicar.';
+    }catch(err){alert('Não foi possível importar: '+err.message)}
+  };
+  rd.readAsText(f);
+}
+
+function render(){
+ const q=document.getElementById("search").value.toLowerCase();
+ const sf=document.getElementById("statusFilter").value,pf=document.getElementById("priorityFilter").value;
+ const list=tasks.filter(t=>{
+   const p=autoPriority(t);
+   return (!q||[t.name,t.action,t.owner,t.evolution,t.notes].join(" ").toLowerCase().includes(q))&&(!sf||t.status===sf)&&(!pf||p===pf);
+ });
+ const sort=document.getElementById("sortFilter")?.value||"urgency";
+ const priorityRank={Urgente:0,Alta:1,Média:2,Aguardando:3,Baixa:4};
+ list.sort((a,b)=>{
+   const pa=autoPriority(a), pb=autoPriority(b);
+   const da=daysLeft(a.due), db=daysLeft(b.due);
+   if(sort==="due") return (da===null?99999:da)-(db===null?99999:db) || a.id-b.id;
+   if(sort==="priority") return (priorityRank[pa]??9)-(priorityRank[pb]??9) || (da===null?99999:da)-(db===null?99999:db);
+   if(sort==="id") return a.id-b.id;
+   const rankA=priorityRank[pa]??9, rankB=priorityRank[pb]??9;
+   return rankA-rankB || (da===null?99999:da)-(db===null?99999:db) || a.id-b.id;
+ });
+ const tb=document.getElementById("tbody");tb.innerHTML="";
+ if(!list.length){tb.innerHTML='<tr><td colspan="10" class="empty">Nenhuma demanda encontrada.</td></tr>'}
+ list.forEach(t=>{
+   const p=autoPriority(t),d=daysLeft(t.due);
+   let dc=d===null?"":d<0?"overdue":d<=3?"soon":"ok";
+   let ds=d===null?"—":d<0?`${Math.abs(d)} dia(s) atrasado`:d===0?"Hoje":`${d} dia(s)`;
+   tb.innerHTML+=`<tr>
+   <td><b>${t.id}</b></td><td><b>${t.name}</b><br><span class="muted">${t.notes||""}</span></td>
+   <td>${t.action||"—"}</td><td>${t.owner||"—"}</td><td>${fmtDate(t.due)}</td>
+   <td class="days ${dc}">${ds}</td><td><span class="badge ${p==="Urgente"?"urgente":priorityClass(p)}">${p}</span></td>
+   <td><span class="badge ${statusClass(t.status)}">${t.status}</span></td>
+   <td>${t.evolution||"—"}</td><td class="actions"><button class="secondary" onclick="editTask(${t.id})">✏️</button><button class="secondary" onclick="deleteTask(${t.id})">🗑️</button></td>
+   </tr>`;
+ });
+ document.getElementById("kTotal").textContent=tasks.length;
+ document.getElementById("kUrgent").textContent=tasks.filter(t=>autoPriority(t)==="Urgente").length;
+ document.getElementById("kProgress").textContent=tasks.filter(t=>t.status==="Em andamento").length;
+ document.getElementById("kWait").textContent=tasks.filter(t=>t.status==="Aguardando").length;
+ document.getElementById("kDone").textContent=tasks.filter(t=>t.status==="Concluída").length;
+}
+function openNew(){editingId=null;clearForm();document.getElementById("modalTitle").textContent="Nova demanda";document.getElementById("modal").classList.add("open")}
+function editTask(id){let t=tasks.find(x=>x.id===id);editingId=id;document.getElementById("modalTitle").textContent="Editar demanda";document.getElementById("fName").value=t.name;document.getElementById("fOwner").value=t.owner;document.getElementById("fAction").value=t.action;document.getElementById("fDue").value=t.due;document.getElementById("fStatus").value=t.status;document.getElementById("fPriority").value=t.priority||"Automática";document.getElementById("fEvolution").value=t.evolution;document.getElementById("fNotes").value=t.notes;previewPriority();document.getElementById("modal").classList.add("open")}
+function clearForm(){["fName","fOwner","fAction","fDue","fEvolution","fNotes"].forEach(id=>document.getElementById(id).value="");document.getElementById("fStatus").value="Pendente";document.getElementById("fPriority").value="Automática";previewPriority()}
+function closeModal(){document.getElementById("modal").classList.remove("open")}
+function previewPriority(){let t={due:document.getElementById("fDue").value,status:document.getElementById("fStatus").value};document.getElementById("priorityHint").textContent="Sugestão automática: "+autoPriority(t)}
+function saveTask(){
+ let id=editingId||Math.max(0,...tasks.map(t=>t.id))+1;
+ let t={id,name:document.getElementById("fName").value.trim(),owner:document.getElementById("fOwner").value.trim(),action:document.getElementById("fAction").value.trim(),due:document.getElementById("fDue").value,status:document.getElementById("fStatus").value,priority:document.getElementById("fPriority").value,evolution:document.getElementById("fEvolution").value.trim(),notes:document.getElementById("fNotes").value.trim()};
+ if(!t.name){alert("Informe o nome da demanda.");return}
+ if(editingId) tasks=tasks.map(x=>x.id===editingId?t:x);else tasks.push(t);
+ save();closeModal();render();
+}
+function deleteTask(id){if(confirm("Excluir esta demanda?")){tasks=tasks.filter(t=>t.id!==id);save();render()}}
+function exportJSON(){let blob=new Blob([JSON.stringify(tasks,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="backup-painel-cjp.json";a.click();URL.revokeObjectURL(a.href)}
+function importJSON(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{tasks=JSON.parse(r.result);save();render();alert("Backup importado.");}catch{alert("Arquivo inválido.")}};r.readAsText(f)}
+render();
+
+const APP_VERSION="2.5";
+const GITHUB_RAW_DATA_URL="https://api.github.com/repos/jcost1985-bit/chefia_ferias/contents/dados.json"; let publishInProgress=false;
+function ghCfg(){return {token:localStorage.getItem("ghToken")||"",owner:localStorage.getItem("ghOwner")||"jcost1985-bit",repo:localStorage.getItem("ghRepo")||"chefia_ferias",branch:localStorage.getItem("ghBranch")||"main",path:localStorage.getItem("ghPath")||"dados.json"}}
+function abrirConfigGitHub(){const c=ghCfg();["Token","Owner","Repo","Branch","Path"].forEach(k=>document.getElementById("gh"+k).value=c[k.toLowerCase()]);document.getElementById("githubConfig").classList.add("open")}
+function fecharConfigGitHub(){document.getElementById("githubConfig").classList.remove("open")}
+function salvarConfigGitHub(){const token=document.getElementById("ghToken").value.trim();if(!token){alert("Informe o token Fine-grained do GitHub.");return}localStorage.setItem("ghToken",token);["Owner","Repo","Branch","Path"].forEach(k=>localStorage.setItem("gh"+k,document.getElementById("gh"+k).value.trim()));fecharConfigGitHub();alert("Configuração salva somente neste navegador.")}
+async function atualizarSistema(){
+  const dirty=localStorage.getItem("cjpDirty")==="1";
+  if(dirty){
+    const ok=confirm("⚠️ Este computador possui alterações locais não publicadas.\n\nSe você atualizar agora, essas alterações locais serão descartadas e o painel carregará os dados publicados no GitHub.\n\nDeseja continuar?");
+    if(!ok)return;
+  }
+  const btn=[...document.querySelectorAll("button")].find(b=>b.textContent.includes("Atualizar sistema"));
+  if(btn){btn.disabled=true;btn.textContent="⏳ Atualizando…";}
+  const st=document.getElementById("syncStatus");
+  try{
+    if(st){st.textContent="🌐 Buscando dados diretamente do GitHub…";st.style.background="#eef6ff";st.style.borderColor="#bfdbfe";st.style.color="#1d4ed8";}
+    const cfg=ghCfg();
+    // Leitura pública: sem headers personalizados para evitar preflight/CORS no navegador.
+    const r=await fetch(GITHUB_RAW_DATA_URL+"?ref="+encodeURIComponent(cfg.branch)+"&refresh="+Date.now(),{cache:"no-store"});
+    if(!r.ok)throw new Error("Não foi possível consultar os dados publicados (HTTP "+r.status+").");
+    const obj=await r.json();
+    if(!obj.content)throw new Error("GitHub não retornou o conteúdo de dados.json.");
+    const binary=atob(obj.content.replace(/\n/g,""));
+    const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));
+    const d=JSON.parse(new TextDecoder("utf-8").decode(bytes));
+    if(!Array.isArray(d))throw new Error("O dados.json publicado está inválido.");
+    tasks=d;
+    localStorage.setItem("cjpTasks",JSON.stringify(tasks));
+    localStorage.removeItem("cjpDirty");
+    render();
+    await atualizarDataPublicacao();
+    if(st){st.textContent=`🟢 DADOS ATUALIZADOS DO GITHUB — ${tasks.length} demandas carregadas`;st.style.background="#ecfdf3";st.style.borderColor="#bbf7d0";st.style.color="#166534";}
+  }catch(e){
+    if(st){st.textContent="❌ Não foi possível atualizar — seus dados locais foram preservados";st.style.background="#fef2f2";st.style.borderColor="#fecaca";st.style.color="#b91c1c";}
+    alert(e.message+"\n\nNenhuma alteração local foi apagada.");
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent="🔄 Atualizar sistema";}
+  }
+}
+async function verificarVersaoSistema(){try{const r=await fetch("index.html?check="+Date.now(),{cache:"no-store"});const html=await r.text();const m=html.match(/<meta\s+name=["']app-version["']\s+content=["']([^"']+)/i);if(m&&m[1]!==APP_VERSION){document.getElementById("updateNotice").classList.add("show");document.getElementById("systemVersion").textContent="🟡 NOVA VERSÃO DISPONÍVEL • atual v"+APP_VERSION+" • nova v"+m[1]}}catch(e){}}
+async function atualizarDataPublicacao(){try{const r=await fetch(GITHUB_RAW_DATA_URL+"?meta="+Date.now(),{method:"HEAD",cache:"no-store"});const lm=r.headers.get("last-modified"),local=localStorage.getItem("cjpLastPublished");const d=local?new Date(local):(lm?new Date(lm):null);document.getElementById("publishedAt").textContent=d&&!isNaN(d)?"Dados publicados: "+d.toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}):"Dados publicados no GitHub"}catch(e){document.getElementById("publishedAt").textContent="Dados publicados no GitHub"}}
+function publicarAtualizacoes(){if(publishInProgress)return;const c=ghCfg();if(!c.token){abrirConfigGitHub();alert("Configure o GitHub uma única vez neste PC.");return}document.getElementById("publishConfirmText").innerHTML=`Você está prestes a publicar <b>${tasks.length} demandas</b> no GitHub.<br><br>O arquivo <b>dados.json</b> será atualizado com os dados atuais deste PC.`;document.getElementById("publishConfirm").classList.add("open")}
+function fecharConfirmacaoPublicacao(){if(!publishInProgress)document.getElementById("publishConfirm").classList.remove("open")}
+function utf8ToBase64(str){const b=new TextEncoder().encode(str);let x="";for(const n of b)x+=String.fromCharCode(n);return btoa(x)}
+async function confirmarPublicacao(){if(publishInProgress)return;const c=ghCfg(),btn=document.getElementById("confirmPublishBtn"),st=document.getElementById("syncStatus");publishInProgress=true;btn.disabled=true;btn.textContent="PUBLICANDO…";try{localStorage.setItem("cjpTasks",JSON.stringify(tasks));localStorage.setItem("cjpDirty","1");st.textContent="🚀 Publicando dados no GitHub…";const api=`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${c.path.split("/").map(encodeURIComponent).join("/")}`;const headers={Accept:"application/vnd.github+json",Authorization:`Bearer ${c.token}`,"X-GitHub-Api-Version":"2022-11-28"};const g=await fetch(api+`?ref=${encodeURIComponent(c.branch)}&t=${Date.now()}`,{headers,cache:"no-store"});if(!g.ok)throw new Error("Não consegui consultar dados.json (HTTP "+g.status+").");const cur=await g.json();const put=await fetch(api,{method:"PUT",headers:{...headers,"Content-Type":"application/json"},body:JSON.stringify({message:"Atualiza Painel CJP",content:utf8ToBase64(JSON.stringify(tasks,null,2)),sha:cur.sha,branch:c.branch})});if(!put.ok){let m="";try{m=(await put.json()).message||""}catch(e){}throw new Error("GitHub recusou a publicação (HTTP "+put.status+")"+(m?": "+m:""));}localStorage.removeItem("cjpDirty");const now=new Date();localStorage.setItem("cjpLastPublished",now.toISOString());st.textContent=`✅ PUBLICADO COM SUCESSO — ${tasks.length} demandas sincronizadas`;st.style.background="#ecfdf3";st.style.borderColor="#bbf7d0";st.style.color="#166534";document.getElementById("publishedAt").textContent="Dados publicados: "+now.toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"});document.getElementById("publishConfirm").classList.remove("open")}catch(e){st.textContent="❌ Falha na publicação — seus dados locais foram preservados";alert(e.message+"\n\nNenhum dado local foi apagado.")}finally{publishInProgress=false;btn.disabled=false;btn.textContent="PUBLICAR"}}
+window.addEventListener("DOMContentLoaded",()=>{verificarVersaoSistema();atualizarDataPublicacao();setInterval(verificarVersaoSistema,300000)});
+
+const _renderPanel=render;
+render=function(){
+  _renderPanel();
+  document.querySelectorAll('tbody tr').forEach(tr=>{
+    ['ID','Demanda','Próxima ação','Responsável','Prazo','Dias','Prioridade','Status','Última evolução','Ações']
+    .forEach((x,i)=>{if(tr.children[i])tr.children[i].setAttribute('data-label',x)});
+  });
+};
+
+</script>
+<script>window.addEventListener("DOMContentLoaded",loadPublishedData);</script>
+
+<div id="publishConfirm" class="confirm-overlay"><div class="confirm-card"><h3>🚀 Publicar atualizações?</h3><p id="publishConfirmText"></p><div class="confirm-actions"><button class="secondary" onclick="fecharConfirmacaoPublicacao()">Cancelar</button><button class="primary" id="confirmPublishBtn" onclick="confirmarPublicacao()">PUBLICAR</button></div></div></div>
+<div id="githubConfig" class="github-config"><div class="github-config-card"><h2>⚙️ Publicação no GitHub</h2><p>Configure uma vez neste PC. O token fica somente neste navegador e não é gravado no código do site.</p><div class="github-ok"><b>Use token Fine-grained</b> limitado ao repositório e com <b>Contents → Read and write</b>.</div><div class="github-field"><label>Token Fine-grained</label><input id="ghToken" type="password" placeholder="github_pat_..."></div><div class="github-field"><label>Owner</label><input id="ghOwner" value="jcost1985-bit"></div><div class="github-field"><label>Repositório</label><input id="ghRepo" value="chefia_ferias"></div><div class="github-field"><label>Branch</label><input id="ghBranch" value="main"></div><div class="github-field"><label>Arquivo</label><input id="ghPath" value="dados.json"></div><div class="github-config-actions"><button class="secondary" onclick="fecharConfigGitHub()">Cancelar</button><button class="primary" onclick="salvarConfigGitHub()">Salvar configuração</button></div></div></div>
+</body>
+</html>
