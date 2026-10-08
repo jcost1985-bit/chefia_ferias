@@ -223,7 +223,7 @@ async function loadPublishedData(){
 
   // Otherwise, ALWAYS read the published GitHub data.
   try{
-    const r=await fetch("dados.json?v="+Date.now(),{
+    const r=await fetch(GITHUB_RAW_DATA_URL+"?v="+Date.now(),{
       cache:"no-store",
       headers:{"Cache-Control":"no-cache"}
     });
@@ -330,7 +330,8 @@ function exportJSON(){let blob=new Blob([JSON.stringify(tasks,null,2)],{type:"ap
 function importJSON(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{tasks=JSON.parse(r.result);save();render();alert("Backup importado.");}catch{alert("Arquivo inválido.")}};r.readAsText(f)}
 render();
 
-const APP_VERSION="2.2"; let publishInProgress=false;
+const APP_VERSION="2.3";
+const GITHUB_RAW_DATA_URL="https://raw.githubusercontent.com/jcost1985-bit/chefia_ferias/main/dados.json"; let publishInProgress=false;
 function ghCfg(){return {token:localStorage.getItem("ghToken")||"",owner:localStorage.getItem("ghOwner")||"jcost1985-bit",repo:localStorage.getItem("ghRepo")||"chefia_ferias",branch:localStorage.getItem("ghBranch")||"main",path:localStorage.getItem("ghPath")||"dados.json"}}
 function abrirConfigGitHub(){const c=ghCfg();["Token","Owner","Repo","Branch","Path"].forEach(k=>document.getElementById("gh"+k).value=c[k.toLowerCase()]);document.getElementById("githubConfig").classList.add("open")}
 function fecharConfigGitHub(){document.getElementById("githubConfig").classList.remove("open")}
@@ -345,8 +346,8 @@ async function atualizarSistema(){
   if(btn){btn.disabled=true;btn.textContent="⏳ Atualizando…";}
   const st=document.getElementById("syncStatus");
   try{
-    if(st){st.textContent="🌐 Buscando dados mais recentes do GitHub…";st.style.background="#eef6ff";st.style.borderColor="#bfdbfe";st.style.color="#1d4ed8";}
-    const r=await fetch("dados.json?refresh="+Date.now(),{cache:"no-store",headers:{"Cache-Control":"no-cache"}});
+    if(st){st.textContent="🌐 Buscando dados diretamente do GitHub…";st.style.background="#eef6ff";st.style.borderColor="#bfdbfe";st.style.color="#1d4ed8";}
+    const r=await fetch(GITHUB_RAW_DATA_URL+"?refresh="+Date.now(),{cache:"no-store",headers:{"Cache-Control":"no-cache"}});
     if(!r.ok)throw new Error("Não foi possível consultar os dados publicados (HTTP "+r.status+").");
     const d=await r.json();
     if(!Array.isArray(d))throw new Error("O dados.json publicado está inválido.");
@@ -364,7 +365,7 @@ async function atualizarSistema(){
   }
 }
 async function verificarVersaoSistema(){try{const r=await fetch("index.html?check="+Date.now(),{cache:"no-store"});const html=await r.text();const m=html.match(/<meta\s+name=["']app-version["']\s+content=["']([^"']+)/i);if(m&&m[1]!==APP_VERSION){document.getElementById("updateNotice").classList.add("show");document.getElementById("systemVersion").textContent="🟡 NOVA VERSÃO DISPONÍVEL • atual v"+APP_VERSION+" • nova v"+m[1]}}catch(e){}}
-async function atualizarDataPublicacao(){try{const r=await fetch("dados.json?meta="+Date.now(),{method:"HEAD",cache:"no-store"});const lm=r.headers.get("last-modified"),local=localStorage.getItem("cjpLastPublished");const d=local?new Date(local):(lm?new Date(lm):null);document.getElementById("publishedAt").textContent=d&&!isNaN(d)?"Dados publicados: "+d.toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}):"Dados publicados no GitHub"}catch(e){document.getElementById("publishedAt").textContent="Dados publicados no GitHub"}}
+async function atualizarDataPublicacao(){try{const r=await fetch(GITHUB_RAW_DATA_URL+"?meta="+Date.now(),{method:"HEAD",cache:"no-store"});const lm=r.headers.get("last-modified"),local=localStorage.getItem("cjpLastPublished");const d=local?new Date(local):(lm?new Date(lm):null);document.getElementById("publishedAt").textContent=d&&!isNaN(d)?"Dados publicados: "+d.toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}):"Dados publicados no GitHub"}catch(e){document.getElementById("publishedAt").textContent="Dados publicados no GitHub"}}
 function publicarAtualizacoes(){if(publishInProgress)return;const c=ghCfg();if(!c.token){abrirConfigGitHub();alert("Configure o GitHub uma única vez neste PC.");return}document.getElementById("publishConfirmText").innerHTML=`Você está prestes a publicar <b>${tasks.length} demandas</b> no GitHub.<br><br>O arquivo <b>dados.json</b> será atualizado com os dados atuais deste PC.`;document.getElementById("publishConfirm").classList.add("open")}
 function fecharConfirmacaoPublicacao(){if(!publishInProgress)document.getElementById("publishConfirm").classList.remove("open")}
 function utf8ToBase64(str){const b=new TextEncoder().encode(str);let x="";for(const n of b)x+=String.fromCharCode(n);return btoa(x)}
