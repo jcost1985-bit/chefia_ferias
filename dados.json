@@ -4,10 +4,10 @@
     "name": "DEFESO ELEITORAL",
     "owner": "CAP JC",
     "action": "CONCLUÍDO - Ofício Circular SECOM/GAB nº. 22/2026 (Encerramento das vedações eleitorais à publicidade institucional – retorno das ações de comunicação)",
-    "due": "",
+    "due": "2026-10-06",
     "status": "Concluída",
     "priority": "Média",
-    "evolution": "",
+    "evolution": "FINALIZADO",
     "notes": ""
   },
   {
@@ -15,10 +15,10 @@
     "name": "VIOLÊNCIA DOMÉSTICA (SECOM)",
     "owner": "CAP JC",
     "action": "EM ANDAMENTO - Contato realizado junto ao Gabriel Brant (Links de Vídeos encaminhados)",
-    "due": "",
-    "status": "Em andamento",
+    "due": "2026-10-05",
+    "status": "Concluída",
     "priority": "Automática",
-    "evolution": "",
+    "evolution": "FINALIZADO",
     "notes": ""
   },
   {
@@ -37,11 +37,11 @@
     "name": "VÍDEO INSTITUCIONAL - IPMS",
     "owner": "Adjunto",
     "action": "Contato/reunião com Cap. Caldeira; avaliar roteiro e possibilidades; despachar com Diretor",
-    "due": "2026-11-05",
-    "status": "Pendente",
+    "due": "2026-10-30",
+    "status": "Em andamento",
     "priority": "Automática",
-    "evolution": "",
-    "notes": ""
+    "evolution": "ATENDIDO",
+    "notes": "Atuaremos na EDIÇÃO."
   },
   {
     "id": 5,
@@ -61,8 +61,8 @@
     "action": "Gravar e editar roteiros da Marcilene; acompanhar produções.",
     "due": "2026-10-20",
     "status": "Em andamento",
-    "priority": "Automática",
-    "evolution": "BRIEFING",
+    "priority": "Alta",
+    "evolution": "CAPTAÇÃO",
     "notes": ""
   },
   {
@@ -117,17 +117,17 @@
     "due": "",
     "status": "Em andamento",
     "priority": "Alta",
-    "evolution": "",
-    "notes": ""
+    "evolution": "IDENTIFICADO",
+    "notes": "N PM 1800473\n3º Sgt Guilherme Bartilotti A de Almeida \n\nEstá na P5/1º BPM"
   },
   {
     "id": 12,
     "name": "PMMG MIRIM",
     "owner": "",
     "action": "Preparar lançamento e materiais.",
-    "due": "2026-10-30",
+    "due": "2026-10-12",
     "status": "Em andamento",
-    "priority": "Automática",
+    "priority": "Urgente",
     "evolution": "EDIÇÃO",
     "notes": ""
   },
@@ -136,10 +136,10 @@
     "name": "VIOLÊNCIA DOMÉSTICA (SÉRIE)",
     "owner": "HI-FI",
     "action": "Dar continuidade à produção e aguardar final do defeso para publicar.",
-    "due": "2026-10-30",
+    "due": "2026-10-16",
     "status": "Em andamento",
     "priority": "Automática",
-    "evolution": "PLANEJAMENTO",
+    "evolution": "APROVADO",
     "notes": ""
   },
   {
