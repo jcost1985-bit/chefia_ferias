@@ -106,6 +106,8 @@ tbody td:nth-child(9)::before{content:"EVOLUÇÃO • ";font-weight:800;color:va
 .publish-btn{font-weight:900!important;display:none!important}
 .github-gear{width:38px!important;height:38px!important;min-height:38px!important;padding:0!important;border:0!important;background:transparent!important;color:#64748b!important;font-size:19px!important;border-radius:50%!important;opacity:.65;box-shadow:none!important}.github-gear:hover{opacity:1;background:#f1f5f9!important}.hidden-sync{display:none!important}.system-bar{display:none!important;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;padding:10px 12px;border-radius:10px;font-size:12px}.system-meta{display:flex;gap:14px;flex-wrap:wrap}.update-notice{display:none!important;background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:10px 12px;border-radius:10px;font-weight:800}.update-notice.show{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.confirm-overlay,.github-config{position:fixed;inset:0;background:rgba(15,23,42,.62);display:none;align-items:center;justify-content:center;padding:16px;z-index:1200}.confirm-overlay.open,.github-config.open{display:flex}.confirm-card,.github-config-card{width:min(500px,100%);background:#fff;border-radius:16px;padding:20px;box-shadow:0 24px 60px rgba(0,0,0,.25)}.confirm-card h3,.github-config-card h2{margin:0 0 10px}.confirm-card p,.github-config-card p{font-size:13px;line-height:1.5}.confirm-actions,.github-config-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}.github-field{margin-top:12px}.github-field label{display:block;font-size:12px;font-weight:800;margin-bottom:5px}.github-field input{width:100%;box-sizing:border-box;padding:10px;border:1px solid #cbd5e1;border-radius:9px}.github-ok{background:#ecfdf3;border:1px solid #bbf7d0;color:#166534;padding:10px;border-radius:10px;font-size:12px}
 @media(max-width:699px){.publish-btn{width:100%;min-height:46px}.system-meta{display:grid;gap:4px}.confirm-actions,.github-config-actions{display:grid;grid-template-columns:1fr 1fr}}
+
+#syncStatus,#publishedAt{display:none!important;}
 </style>
 <meta name="app-version" content="3.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -113,11 +115,11 @@ tbody td:nth-child(9)::before{content:"EVOLUÇÃO • ";font-weight:800;color:va
 <meta http-equiv="Expires" content="0">
 </head>
 <body>
-<header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • versão 3.0 • 08/10/2026</p></header>
+<header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • versão 3.1 • 08/10/2026</p></header>
 <main>
 <div class="toolbar">
 <button class="primary" onclick="openNew()">＋ Nova demanda</button>
-<button class="github-gear" onclick="abrirConfigGitHub()" title="Configurar GitHub" aria-label="Configurar GitHub">⚙️</button>
+<button class="github-gear" onclick="abrirConfigGitHub()" title="Conexão segura com o GitHub" aria-label="Conexão segura com o GitHub">⚙️</button>
 <input id="importFile" type="file" accept=".json" hidden onchange="importJSON(event)">
 <div id="syncStatus" class="sync-status hidden-sync">Sincronização</div>
 </div>
@@ -339,42 +341,54 @@ function exportJSON(){let blob=new Blob([JSON.stringify(tasks,null,2)],{type:"ap
 function importJSON(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{tasks=JSON.parse(r.result);save();render();alert("Backup importado.");}catch{alert("Arquivo inválido.")}};r.readAsText(f)}
 render();
 
-const APP_VERSION="3.0";
-const EMBEDDED_GITHUB_TOKEN='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';
+const APP_VERSION="3.1";
+const PUBLISH_ENDPOINT="https://painel-cjp.jcost-1985.workers.dev/publish";
 let publishInProgress=false;
-function ghCfg(){return {token:EMBEDDED_GITHUB_TOKEN,owner:"jcost1985-bit",repo:"chefia_ferias",branch:"main",path:"dados.json"}}
-function abrirConfigGitHub(){const c=ghCfg();["Token","Owner","Repo","Branch","Path"].forEach(k=>document.getElementById("gh"+k).value=c[k.toLowerCase()]);document.getElementById("githubConfig").classList.add("open")}
-function fecharConfigGitHub(){document.getElementById("githubConfig").classList.remove("open")}
-function salvarConfigGitHub(){const token=document.getElementById("ghToken").value.trim();if(!token){alert("Informe o token Fine-grained do GitHub.");return}localStorage.setItem("ghToken",token);["Owner","Repo","Branch","Path"].forEach(k=>localStorage.setItem("gh"+k,document.getElementById("gh"+k).value.trim()));fecharConfigGitHub();alert("O GitHub já está configurado no sistema.")}
+
+function abrirConfigGitHub(){
+  alert("A conexão com o GitHub é feita automaticamente pelo serviço seguro do Painel CJP. Não é necessário informar token neste dispositivo.");
+}
+function fecharConfigGitHub(){ }
+function salvarConfigGitHub(){ }
+
 async function publicarAutomaticamente(){
   if(publishInProgress)return;
-  const c=ghCfg();
-  if(!c.token){
-    abrirConfigGitHub();
-    alert("A demanda foi salva neste dispositivo. Configure o GitHub uma única vez para que os próximos salvamentos sejam publicados automaticamente.");
-    return;
-  }
   publishInProgress=true;
+  const st=document.getElementById("syncStatus");
   try{
     localStorage.setItem("cjpTasks",JSON.stringify(tasks));
     localStorage.setItem("cjpDirty","1");
-    const api=`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${c.path.split("/").map(encodeURIComponent).join("/")}`;
-    const headers={Accept:"application/vnd.github+json",Authorization:`Bearer ${c.token}`,"X-GitHub-Api-Version":"2022-11-28"};
-    const g=await fetch(api+`?ref=${encodeURIComponent(c.branch)}&t=${Date.now()}`,{headers,cache:"no-store"});
-    if(!g.ok)throw new Error("Não consegui consultar dados.json (HTTP "+g.status+").");
-    const cur=await g.json();
-    const put=await fetch(api,{method:"PUT",headers:{...headers,"Content-Type":"application/json"},body:JSON.stringify({message:"Atualiza Painel CJP",content:utf8ToBase64(JSON.stringify(tasks,null,2)),sha:cur.sha,branch:c.branch})});
-    if(!put.ok){let m="";try{m=(await put.json()).message||""}catch(e){}throw new Error("GitHub recusou a publicação (HTTP "+put.status+")"+(m?": "+m:""));}
+    if(st){
+      st.textContent="🚀 Salvando no GitHub…";
+      st.style.background="#eef6ff";st.style.borderColor="#bfdbfe";st.style.color="#1d4ed8";
+    }
+    const r=await fetch(PUBLISH_ENDPOINT,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({tasks})
+    });
+    const data=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(data.error||`Serviço de publicação recusou a operação (HTTP ${r.status}).`);
     localStorage.removeItem("cjpDirty");
     localStorage.setItem("cjpLastPublished",new Date().toISOString());
+    if(st){
+      st.textContent=`☁️ Salvo no GitHub — ${tasks.length} demandas sincronizadas`;
+      st.style.background="#ecfdf3";st.style.borderColor="#bbf7d0";st.style.color="#166534";
+    }
   }catch(e){
+    if(st){
+      st.textContent="⚠️ Salvo neste dispositivo — aguardando publicação";
+      st.style.background="#fff7ed";st.style.borderColor="#fed7aa";st.style.color="#9a3412";
+    }
     alert("A demanda foi salva neste dispositivo, mas não foi possível publicar no GitHub agora.\n\n"+e.message+"\n\nSeus dados locais foram preservados.");
   }finally{publishInProgress=false;}
 }
-function publicarAtualizacoes(){if(publishInProgress)return;const c=ghCfg();if(!c.token){abrirConfigGitHub();alert("Configure o GitHub uma única vez neste PC.");return}document.getElementById("publishConfirmText").innerHTML=`Você está prestes a publicar <b>${tasks.length} demandas</b> no GitHub.<br><br>O arquivo <b>dados.json</b> será atualizado com os dados atuais deste PC.`;document.getElementById("publishConfirm").classList.add("open")}
-function fecharConfirmacaoPublicacao(){if(!publishInProgress)document.getElementById("publishConfirm").classList.remove("open")}
+
+// Mantido apenas por compatibilidade com versões anteriores.
+function publicarAtualizacoes(){ publicarAutomaticamente(); }
+function fecharConfirmacaoPublicacao(){ }
 function utf8ToBase64(str){const b=new TextEncoder().encode(str);let x="";for(const n of b)x+=String.fromCharCode(n);return btoa(x)}
-async function confirmarPublicacao(){if(publishInProgress)return;const c=ghCfg(),btn=document.getElementById("confirmPublishBtn"),st=document.getElementById("syncStatus");publishInProgress=true;btn.disabled=true;btn.textContent="PUBLICANDO…";try{localStorage.setItem("cjpTasks",JSON.stringify(tasks));localStorage.setItem("cjpDirty","1");st.textContent="🚀 Publicando dados no GitHub…";const api=`https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${c.path.split("/").map(encodeURIComponent).join("/")}`;const headers={Accept:"application/vnd.github+json",Authorization:`Bearer ${c.token}`,"X-GitHub-Api-Version":"2022-11-28"};const g=await fetch(api+`?ref=${encodeURIComponent(c.branch)}&t=${Date.now()}`,{headers,cache:"no-store"});if(!g.ok)throw new Error("Não consegui consultar dados.json (HTTP "+g.status+").");const cur=await g.json();const put=await fetch(api,{method:"PUT",headers:{...headers,"Content-Type":"application/json"},body:JSON.stringify({message:"Atualiza Painel CJP",content:utf8ToBase64(JSON.stringify(tasks,null,2)),sha:cur.sha,branch:c.branch})});if(!put.ok){let m="";try{m=(await put.json()).message||""}catch(e){}throw new Error("GitHub recusou a publicação (HTTP "+put.status+")"+(m?": "+m:""));}localStorage.removeItem("cjpDirty");const now=new Date();localStorage.setItem("cjpLastPublished",now.toISOString());st.textContent=`✅ PUBLICADO COM SUCESSO — ${tasks.length} demandas sincronizadas`;st.style.background="#ecfdf3";st.style.borderColor="#bbf7d0";st.style.color="#166534";document.getElementById("publishedAt").textContent="Dados publicados: "+now.toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"});document.getElementById("publishConfirm").classList.remove("open")}catch(e){st.textContent="❌ Falha na publicação — seus dados locais foram preservados";alert(e.message+"\n\nNenhum dado local foi apagado.")}finally{publishInProgress=false;btn.disabled=false;btn.textContent="PUBLICAR"}}
+async function confirmarPublicacao(){ return publicarAutomaticamente(); }
 
 
 const _renderPanel=render;
@@ -389,7 +403,7 @@ render=function(){
 </script>
 <script>window.addEventListener("DOMContentLoaded",loadPublishedData);</script>
 
-<div id="publishConfirm" class="confirm-overlay"><div class="confirm-card"><h3>🚀 Publicar atualizações?</h3><p id="publishConfirmText"></p><div class="confirm-actions"><button class="secondary" onclick="fecharConfirmacaoPublicacao()">Cancelar</button><button class="primary" id="confirmPublishBtn" onclick="confirmarPublicacao()">PUBLICAR</button></div></div></div>
-<div id="githubConfig" class="github-config"><div class="github-config-card"><h2>⚙️ Publicação no GitHub</h2><p>Configure uma vez neste PC. O token fica somente neste navegador e não é gravado no código do site.</p><div class="github-ok"><b>Use token Fine-grained</b> limitado ao repositório e com <b>Contents → Read and write</b>.</div><div class="github-field"><label>Token Fine-grained</label><input id="ghToken" type="password" placeholder="github_pat_..."></div><div class="github-field"><label>Owner</label><input id="ghOwner" value="jcost1985-bit"></div><div class="github-field"><label>Repositório</label><input id="ghRepo" value="chefia_ferias"></div><div class="github-field"><label>Branch</label><input id="ghBranch" value="main"></div><div class="github-field"><label>Arquivo</label><input id="ghPath" value="dados.json"></div><div class="github-config-actions"><button class="secondary" onclick="fecharConfigGitHub()">Cancelar</button><button class="primary" onclick="salvarConfigGitHub()">Salvar configuração</button></div></div></div>
+
+
 </body>
 </html>
