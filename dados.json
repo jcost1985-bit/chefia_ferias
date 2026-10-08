@@ -152,27 +152,5 @@
     "priority": "Automática",
     "evolution": "",
     "notes": ""
-  },
-  {
-    "id": 15,
-    "name": "TESTE",
-    "owner": "",
-    "action": "",
-    "due": "2026-10-08",
-    "status": "Em andamento",
-    "priority": "Urgente",
-    "evolution": "",
-    "notes": ""
-  },
-  {
-    "id": 16,
-    "name": "Tarde 2",
-    "owner": "",
-    "action": "",
-    "due": "",
-    "status": "Pendente",
-    "priority": "Automática",
-    "evolution": "",
-    "notes": ""
   }
 ]
