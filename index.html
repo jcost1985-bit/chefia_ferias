@@ -106,7 +106,7 @@ tbody td:nth-child(9)::before{content:"EVOLUÇÃO • ";font-weight:800;color:va
 .publish-btn{font-weight:900!important}.system-bar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;padding:10px 12px;border-radius:10px;font-size:12px}.system-meta{display:flex;gap:14px;flex-wrap:wrap}.update-notice{display:none;background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:10px 12px;border-radius:10px;font-weight:800}.update-notice.show{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.confirm-overlay,.github-config{position:fixed;inset:0;background:rgba(15,23,42,.62);display:none;align-items:center;justify-content:center;padding:16px;z-index:1200}.confirm-overlay.open,.github-config.open{display:flex}.confirm-card,.github-config-card{width:min(500px,100%);background:#fff;border-radius:16px;padding:20px;box-shadow:0 24px 60px rgba(0,0,0,.25)}.confirm-card h3,.github-config-card h2{margin:0 0 10px}.confirm-card p,.github-config-card p{font-size:13px;line-height:1.5}.confirm-actions,.github-config-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}.github-field{margin-top:12px}.github-field label{display:block;font-size:12px;font-weight:800;margin-bottom:5px}.github-field input{width:100%;box-sizing:border-box;padding:10px;border:1px solid #cbd5e1;border-radius:9px}.github-ok{background:#ecfdf3;border:1px solid #bbf7d0;color:#166534;padding:10px;border-radius:10px;font-size:12px}
 @media(max-width:699px){.publish-btn{width:100%;min-height:46px}.system-meta{display:grid;gap:4px}.confirm-actions,.github-config-actions{display:grid;grid-template-columns:1fr 1fr}}
 </style>
-<meta name="app-version" content="2.4">
+<meta name="app-version" content="2.5">
 </head>
 <body>
 <header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • versão 2.5 • 08/10/2026</p></header>
@@ -223,10 +223,10 @@ async function loadPublishedData(){
 
   // Otherwise, ALWAYS read the published GitHub data.
   try{
-    const r=await fetch(GITHUB_RAW_DATA_URL+"?ref=main&v="+Date.now(),{
-      cache:"no-store",
-      headers:{"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}
-    });
+    const cfg=ghCfg();
+    const headers={"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","Cache-Control":"no-cache"};
+    if(cfg.token) headers["Authorization"]="Bearer "+cfg.token;
+    const r=await fetch(GITHUB_RAW_DATA_URL+"?ref="+encodeURIComponent(cfg.branch)+"&v="+Date.now(),{cache:"no-store",headers});
     if(!r.ok) throw new Error("GitHub não respondeu (HTTP "+r.status+")");
     const obj=await r.json();
     if(!obj.content) throw new Error("GitHub não retornou o conteúdo de dados.json");
@@ -351,7 +351,10 @@ async function atualizarSistema(){
   const st=document.getElementById("syncStatus");
   try{
     if(st){st.textContent="🌐 Buscando dados diretamente do GitHub…";st.style.background="#eef6ff";st.style.borderColor="#bfdbfe";st.style.color="#1d4ed8";}
-    const r=await fetch(GITHUB_RAW_DATA_URL+"?refresh="+Date.now(),{cache:"no-store",headers:{"Cache-Control":"no-cache"}});
+    const cfg=ghCfg();
+    const headers={"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","Cache-Control":"no-cache"};
+    if(cfg.token) headers["Authorization"]="Bearer "+cfg.token;
+    const r=await fetch(GITHUB_RAW_DATA_URL+"?ref="+encodeURIComponent(cfg.branch)+"&refresh="+Date.now(),{cache:"no-store",headers});
     if(!r.ok)throw new Error("Não foi possível consultar os dados publicados (HTTP "+r.status+").");
     const obj=await r.json();
     if(!obj.content)throw new Error("GitHub não retornou o conteúdo de dados.json.");
