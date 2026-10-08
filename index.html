@@ -106,15 +106,15 @@ tbody td:nth-child(9)::before{content:"EVOLUÇÃO • ";font-weight:800;color:va
 .publish-btn{font-weight:900!important}.system-bar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;padding:10px 12px;border-radius:10px;font-size:12px}.system-meta{display:flex;gap:14px;flex-wrap:wrap}.update-notice{display:none;background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:10px 12px;border-radius:10px;font-weight:800}.update-notice.show{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.confirm-overlay,.github-config{position:fixed;inset:0;background:rgba(15,23,42,.62);display:none;align-items:center;justify-content:center;padding:16px;z-index:1200}.confirm-overlay.open,.github-config.open{display:flex}.confirm-card,.github-config-card{width:min(500px,100%);background:#fff;border-radius:16px;padding:20px;box-shadow:0 24px 60px rgba(0,0,0,.25)}.confirm-card h3,.github-config-card h2{margin:0 0 10px}.confirm-card p,.github-config-card p{font-size:13px;line-height:1.5}.confirm-actions,.github-config-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}.github-field{margin-top:12px}.github-field label{display:block;font-size:12px;font-weight:800;margin-bottom:5px}.github-field input{width:100%;box-sizing:border-box;padding:10px;border:1px solid #cbd5e1;border-radius:9px}.github-ok{background:#ecfdf3;border:1px solid #bbf7d0;color:#166534;padding:10px;border-radius:10px;font-size:12px}
 @media(max-width:699px){.publish-btn{width:100%;min-height:46px}.system-meta{display:grid;gap:4px}.confirm-actions,.github-config-actions{display:grid;grid-template-columns:1fr 1fr}}
 </style>
-<meta name="app-version" content="2.1">
+<meta name="app-version" content="2.2">
 </head>
 <body>
-<header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • versão 2.1 • 08/10/2026</p></header>
+<header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • versão 2.2 • 08/10/2026</p></header>
 <main>
 <div class="toolbar">
 <div style="width:100%;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:10px;font-size:13px"><b>🔒 Seus dados são preservados:</b> o PC publica o arquivo <b>dados.json</b>; celular e PC usam os mesmos dados publicados.</div>
 <div id="updateNotice" class="update-notice"><span>🆕 Nova versão do sistema disponível.</span><button class="primary" onclick="atualizarSistema()">🔄 ATUALIZAR SISTEMA</button></div>
-<div class="system-bar"><div class="system-meta"><strong id="systemVersion">🟢 SISTEMA ATUALIZADO • v2.1</strong><span id="publishedAt">Dados publicados: verificando…</span></div><button class="secondary" onclick="atualizarSistema()">🔄 Atualizar sistema</button></div>
+<div class="system-bar"><div class="system-meta"><strong id="systemVersion">🟢 SISTEMA ATUALIZADO • v2.2</strong><span id="publishedAt">Dados publicados: verificando…</span></div><button class="secondary" onclick="atualizarSistema()">🔄 Atualizar sistema</button></div>
 <button class="primary" onclick="openNew()">＋ Nova demanda</button>
 <button class="primary publish-btn" onclick="publicarAtualizacoes()">🚀 PUBLICAR ATUALIZAÇÕES</button>
 <button class="secondary" onclick="abrirConfigGitHub()">⚙️ GitHub</button>
@@ -330,12 +330,39 @@ function exportJSON(){let blob=new Blob([JSON.stringify(tasks,null,2)],{type:"ap
 function importJSON(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{tasks=JSON.parse(r.result);save();render();alert("Backup importado.");}catch{alert("Arquivo inválido.")}};r.readAsText(f)}
 render();
 
-const APP_VERSION="2.1"; let publishInProgress=false;
+const APP_VERSION="2.2"; let publishInProgress=false;
 function ghCfg(){return {token:localStorage.getItem("ghToken")||"",owner:localStorage.getItem("ghOwner")||"jcost1985-bit",repo:localStorage.getItem("ghRepo")||"chefia_ferias",branch:localStorage.getItem("ghBranch")||"main",path:localStorage.getItem("ghPath")||"dados.json"}}
 function abrirConfigGitHub(){const c=ghCfg();["Token","Owner","Repo","Branch","Path"].forEach(k=>document.getElementById("gh"+k).value=c[k.toLowerCase()]);document.getElementById("githubConfig").classList.add("open")}
 function fecharConfigGitHub(){document.getElementById("githubConfig").classList.remove("open")}
 function salvarConfigGitHub(){const token=document.getElementById("ghToken").value.trim();if(!token){alert("Informe o token Fine-grained do GitHub.");return}localStorage.setItem("ghToken",token);["Owner","Repo","Branch","Path"].forEach(k=>localStorage.setItem("gh"+k,document.getElementById("gh"+k).value.trim()));fecharConfigGitHub();alert("Configuração salva somente neste navegador.")}
-function atualizarSistema(){const u=new URL(location.href);u.searchParams.set("v",Date.now());location.replace(u.toString())}
+async function atualizarSistema(){
+  const dirty=localStorage.getItem("cjpDirty")==="1";
+  if(dirty){
+    const ok=confirm("⚠️ Este computador possui alterações locais não publicadas.\n\nSe você atualizar agora, essas alterações locais serão descartadas e o painel carregará os dados publicados no GitHub.\n\nDeseja continuar?");
+    if(!ok)return;
+  }
+  const btn=[...document.querySelectorAll("button")].find(b=>b.textContent.includes("Atualizar sistema"));
+  if(btn){btn.disabled=true;btn.textContent="⏳ Atualizando…";}
+  const st=document.getElementById("syncStatus");
+  try{
+    if(st){st.textContent="🌐 Buscando dados mais recentes do GitHub…";st.style.background="#eef6ff";st.style.borderColor="#bfdbfe";st.style.color="#1d4ed8";}
+    const r=await fetch("dados.json?refresh="+Date.now(),{cache:"no-store",headers:{"Cache-Control":"no-cache"}});
+    if(!r.ok)throw new Error("Não foi possível consultar os dados publicados (HTTP "+r.status+").");
+    const d=await r.json();
+    if(!Array.isArray(d))throw new Error("O dados.json publicado está inválido.");
+    tasks=d;
+    localStorage.setItem("cjpTasks",JSON.stringify(tasks));
+    localStorage.removeItem("cjpDirty");
+    render();
+    await atualizarDataPublicacao();
+    if(st){st.textContent=`🟢 DADOS ATUALIZADOS DO GITHUB — ${tasks.length} demandas carregadas`;st.style.background="#ecfdf3";st.style.borderColor="#bbf7d0";st.style.color="#166534";}
+  }catch(e){
+    if(st){st.textContent="❌ Não foi possível atualizar — seus dados locais foram preservados";st.style.background="#fef2f2";st.style.borderColor="#fecaca";st.style.color="#b91c1c";}
+    alert(e.message+"\n\nNenhuma alteração local foi apagada.");
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent="🔄 Atualizar sistema";}
+  }
+}
 async function verificarVersaoSistema(){try{const r=await fetch("index.html?check="+Date.now(),{cache:"no-store"});const html=await r.text();const m=html.match(/<meta\s+name=["']app-version["']\s+content=["']([^"']+)/i);if(m&&m[1]!==APP_VERSION){document.getElementById("updateNotice").classList.add("show");document.getElementById("systemVersion").textContent="🟡 NOVA VERSÃO DISPONÍVEL • atual v"+APP_VERSION+" • nova v"+m[1]}}catch(e){}}
 async function atualizarDataPublicacao(){try{const r=await fetch("dados.json?meta="+Date.now(),{method:"HEAD",cache:"no-store"});const lm=r.headers.get("last-modified"),local=localStorage.getItem("cjpLastPublished");const d=local?new Date(local):(lm?new Date(lm):null);document.getElementById("publishedAt").textContent=d&&!isNaN(d)?"Dados publicados: "+d.toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}):"Dados publicados no GitHub"}catch(e){document.getElementById("publishedAt").textContent="Dados publicados no GitHub"}}
 function publicarAtualizacoes(){if(publishInProgress)return;const c=ghCfg();if(!c.token){abrirConfigGitHub();alert("Configure o GitHub uma única vez neste PC.");return}document.getElementById("publishConfirmText").innerHTML=`Você está prestes a publicar <b>${tasks.length} demandas</b> no GitHub.<br><br>O arquivo <b>dados.json</b> será atualizado com os dados atuais deste PC.`;document.getElementById("publishConfirm").classList.add("open")}
