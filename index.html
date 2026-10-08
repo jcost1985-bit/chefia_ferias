@@ -109,12 +109,12 @@ tbody td:nth-child(9)::before{content:"EVOLUÇÃO • ";font-weight:800;color:va
 <meta name="app-version" content="2.4">
 </head>
 <body>
-<header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • versão 2.4 • 08/10/2026</p></header>
+<header><h1>📋 Painel de Controle — CJP</h1><p>Demandas, prazos, prioridades e evolução • versão 2.5 • 08/10/2026</p></header>
 <main>
 <div class="toolbar">
 <div style="width:100%;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:10px;font-size:13px"><b>🔒 Seus dados são preservados:</b> o PC publica o arquivo <b>dados.json</b>; celular e PC usam os mesmos dados publicados.</div>
 <div id="updateNotice" class="update-notice"><span>🆕 Nova versão do sistema disponível.</span><button class="primary" onclick="atualizarSistema()">🔄 ATUALIZAR SISTEMA</button></div>
-<div class="system-bar"><div class="system-meta"><strong id="systemVersion">🟢 SISTEMA ATUALIZADO • v2.4</strong><span id="publishedAt">Dados publicados: verificando…</span></div><button class="secondary" onclick="atualizarSistema()">🔄 Atualizar sistema</button></div>
+<div class="system-bar"><div class="system-meta"><strong id="systemVersion">🟢 SISTEMA ATUALIZADO • v2.5</strong><span id="publishedAt">Dados publicados: verificando…</span></div><button class="secondary" onclick="atualizarSistema()">🔄 Atualizar sistema</button></div>
 <button class="primary" onclick="openNew()">＋ Nova demanda</button>
 <button class="primary publish-btn" onclick="publicarAtualizacoes()">🚀 PUBLICAR ATUALIZAÇÕES</button>
 <button class="secondary" onclick="abrirConfigGitHub()">⚙️ GitHub</button>
@@ -334,7 +334,7 @@ function exportJSON(){let blob=new Blob([JSON.stringify(tasks,null,2)],{type:"ap
 function importJSON(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{tasks=JSON.parse(r.result);save();render();alert("Backup importado.");}catch{alert("Arquivo inválido.")}};r.readAsText(f)}
 render();
 
-const APP_VERSION="2.3";
+const APP_VERSION="2.5";
 const GITHUB_RAW_DATA_URL="https://api.github.com/repos/jcost1985-bit/chefia_ferias/contents/dados.json"; let publishInProgress=false;
 function ghCfg(){return {token:localStorage.getItem("ghToken")||"",owner:localStorage.getItem("ghOwner")||"jcost1985-bit",repo:localStorage.getItem("ghRepo")||"chefia_ferias",branch:localStorage.getItem("ghBranch")||"main",path:localStorage.getItem("ghPath")||"dados.json"}}
 function abrirConfigGitHub(){const c=ghCfg();["Token","Owner","Repo","Branch","Path"].forEach(k=>document.getElementById("gh"+k).value=c[k.toLowerCase()]);document.getElementById("githubConfig").classList.add("open")}
@@ -353,7 +353,11 @@ async function atualizarSistema(){
     if(st){st.textContent="🌐 Buscando dados diretamente do GitHub…";st.style.background="#eef6ff";st.style.borderColor="#bfdbfe";st.style.color="#1d4ed8";}
     const r=await fetch(GITHUB_RAW_DATA_URL+"?refresh="+Date.now(),{cache:"no-store",headers:{"Cache-Control":"no-cache"}});
     if(!r.ok)throw new Error("Não foi possível consultar os dados publicados (HTTP "+r.status+").");
-    const d=await r.json();
+    const obj=await r.json();
+    if(!obj.content)throw new Error("GitHub não retornou o conteúdo de dados.json.");
+    const binary=atob(obj.content.replace(/\n/g,""));
+    const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));
+    const d=JSON.parse(new TextDecoder("utf-8").decode(bytes));
     if(!Array.isArray(d))throw new Error("O dados.json publicado está inválido.");
     tasks=d;
     localStorage.setItem("cjpTasks",JSON.stringify(tasks));
