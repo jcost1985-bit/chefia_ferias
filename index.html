@@ -206,52 +206,74 @@ async function loadPublishedData(){
   const s=document.getElementById("syncStatus");
   const dirty=localStorage.getItem("cjpDirty")==="1";
 
-  // Only keep local data if THIS device has unpublished edits.
+  // Se há alterações locais não publicadas, preserva-as neste dispositivo.
+  // Não sobrescreve trabalho local com uma versão remota antiga.
   if(dirty){
     try{
       const local=JSON.parse(localStorage.getItem("cjpTasks")||"null");
       if(Array.isArray(local)){
         tasks=local;
+        render();
         if(s){
           s.textContent="💾 Alterações locais não publicadas";
           s.style.background="#fff7ed";
           s.style.borderColor="#fed7aa";
           s.style.color="#9a3412";
         }
-        render();
+        // Tenta publicar automaticamente ao reabrir a página.
+        setTimeout(()=>publicarAutomaticamente(),150);
         return;
       }
     }catch(e){}
   }
 
-  // Otherwise, ALWAYS read the published GitHub data.
-  try{
-    const r=await fetch("dados.json?v="+Date.now(),{
-      cache:"no-store",
-      headers:{"Cache-Control":"no-cache"}
-    });
-    if(!r.ok) throw new Error("dados.json não encontrado");
-    const d=await r.json();
-    if(!Array.isArray(d)) throw new Error("dados.json inválido");
-    tasks=d;
-    localStorage.setItem("cjpTasks",JSON.stringify(tasks));
-    localStorage.removeItem("cjpDirty");
-    if(s){
-      s.textContent="🌐 Dados publicados no GitHub";
-      s.style.background="#ecfdf3";
-      s.style.borderColor="#bbf7d0";
-      s.style.color="#166534";
-    }
-    render();
-  }catch(e){
-    // If GitHub cannot be reached, use the last local copy only as fallback.
+  // Sem alterações locais pendentes: a fonte oficial é o dados.json publicado.
+  // Usamos o Raw do GitHub + cache-busting para evitar versões antigas do GitHub Pages.
+  const sources=[
+    "https://raw.githubusercontent.com/jcost1985-bit/chefia_ferias/main/dados.json?ts="+Date.now(),
+    "dados.json?v="+Date.now()
+  ];
+
+  let lastError=null;
+  for(const url of sources){
     try{
-      const local=JSON.parse(localStorage.getItem("cjpTasks")||"null");
-      if(Array.isArray(local)){ tasks=local; render(); }
-    }catch(x){}
-    if(s)s.textContent="⚠️ Não foi possível consultar os dados publicados";
+      const r=await fetch(url,{cache:"no-store",headers:{"Cache-Control":"no-cache"}});
+      if(!r.ok) throw new Error(`HTTP ${r.status}`);
+      const d=await r.json();
+      if(!Array.isArray(d)) throw new Error("dados.json inválido");
+      tasks=d;
+      localStorage.setItem("cjpTasks",JSON.stringify(tasks));
+      localStorage.removeItem("cjpDirty");
+      if(s){
+        s.textContent=`🌐 Dados publicados no GitHub — ${tasks.length} demandas`;
+        s.style.background="#ecfdf3";
+        s.style.borderColor="#bbf7d0";
+        s.style.color="#166534";
+      }
+      render();
+      return;
+    }catch(e){ lastError=e; }
   }
+
+  // Só usa a cópia local como último recurso.
+  try{
+    const local=JSON.parse(localStorage.getItem("cjpTasks")||"null");
+    if(Array.isArray(local)){
+      tasks=local;
+      render();
+      if(s){
+        s.textContent="⚠️ GitHub indisponível — usando cópia local";
+        s.style.background="#fff7ed";
+        s.style.borderColor="#fed7aa";
+        s.style.color="#9a3412";
+      }
+      return;
+    }
+  }catch(e){}
+
+  if(s) s.textContent="⚠️ Não foi possível carregar as demandas";
 }
+
 function exportJSON(){
   save();
   const blob=new Blob([JSON.stringify(tasks,null,2)],{type:'application/json'});
