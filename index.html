@@ -102,10 +102,6 @@ tbody td:nth-child(9)::before{content:"EVOLUÇÃO • ";font-weight:800;color:va
   .modal-actions{display:grid!important;grid-template-columns:1fr 1fr}
 }
 
-
-.publish-btn{font-weight:900}
-.publish-help{width:100%;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.45}
-@media(max-width:699px){.publish-btn{width:100%;min-height:46px}}
 </style>
 </head>
 <body>
@@ -114,10 +110,10 @@ tbody td:nth-child(9)::before{content:"EVOLUÇÃO • ";font-weight:800;color:va
 <div class="toolbar">
 <div style="width:100%;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px 12px;border-radius:10px;font-size:13px"><b>🔒 Seus dados são preservados:</b> o PC publica o arquivo <b>dados.json</b>; celular e PC usam os mesmos dados publicados.</div>
 <button class="primary" onclick="openNew()">＋ Nova demanda</button>
-<button class="primary publish-btn" onclick="publicarAtualizacoes()">🚀 PUBLICAR ATUALIZAÇÕES</button>
+<button class="secondary" onclick="exportJSON()">Baixar dados.json</button>
 <button class="secondary" onclick="document.getElementById('importFile').click()">Importar dados</button>
 <input id="importFile" type="file" accept=".json" hidden onchange="importJSON(event)">
-<div id="syncStatus" class="sync-status">🌐 Carregando dados publicados…</div><div class="publish-help"><b>Como publicar:</b> altere no PC → clique em <b>🚀 PUBLICAR ATUALIZAÇÕES</b> → substitua o <b>dados.json</b> no GitHub → <b>Commit changes</b>.</div>
+<div id="syncStatus" class="sync-status">🌐 Carregando dados publicados…</div>
 
 </div>
 
@@ -181,9 +177,10 @@ function statusClass(s){return ({Pendente:"pendente","Em andamento":"normal",Agu
 function save(){
   try{
     localStorage.setItem("cjpTasks", JSON.stringify(tasks));
+    localStorage.setItem("cjpDirty", "1");
     const s=document.getElementById("syncStatus");
     if(s){
-      s.textContent="💾 Alterações salvas neste dispositivo";
+      s.textContent="💾 Alterações salvas no PC — ainda não publicadas";
       s.style.background="#fff7ed";
       s.style.borderColor="#fed7aa";
       s.style.color="#9a3412";
@@ -196,53 +193,55 @@ function save(){
 }
 
 async function loadPublishedData(){
-  const s=document.getElementById('syncStatus');
-  try{
-    const raw=localStorage.getItem("cjpTasks");
-    if(raw){
-      const local=JSON.parse(raw);
+  const s=document.getElementById("syncStatus");
+  const dirty=localStorage.getItem("cjpDirty")==="1";
+
+  // Only keep local data if THIS device has unpublished edits.
+  if(dirty){
+    try{
+      const local=JSON.parse(localStorage.getItem("cjpTasks")||"null");
       if(Array.isArray(local)){
         tasks=local;
         if(s){
-          s.textContent="💾 Dados salvos neste dispositivo";
-          s.style.background="#ecfdf3";
-          s.style.borderColor="#bbf7d0";
-          s.style.color="#166534";
+          s.textContent="💾 Alterações locais não publicadas";
+          s.style.background="#fff7ed";
+          s.style.borderColor="#fed7aa";
+          s.style.color="#9a3412";
         }
         render();
         return;
       }
-    }
-  }catch(e){}
+    }catch(e){}
+  }
 
+  // Otherwise, ALWAYS read the published GitHub data.
   try{
-    const r=await fetch("dados.json?v="+Date.now(),{cache:"no-store"});
-    if(!r.ok) throw new Error();
+    const r=await fetch("dados.json?v="+Date.now(),{
+      cache:"no-store",
+      headers:{"Cache-Control":"no-cache"}
+    });
+    if(!r.ok) throw new Error("dados.json não encontrado");
     const d=await r.json();
-    if(!Array.isArray(d)) throw new Error();
+    if(!Array.isArray(d)) throw new Error("dados.json inválido");
     tasks=d;
     localStorage.setItem("cjpTasks",JSON.stringify(tasks));
-    if(s)s.textContent="🌐 Dados publicados carregados";
+    localStorage.removeItem("cjpDirty");
+    if(s){
+      s.textContent="🌐 Dados publicados no GitHub";
+      s.style.background="#ecfdf3";
+      s.style.borderColor="#bbf7d0";
+      s.style.color="#166534";
+    }
     render();
   }catch(e){
-    tasks=initialTasks;
-    render();
-    if(s)s.textContent="⚠️ Não foi possível carregar os dados publicados";
+    // If GitHub cannot be reached, use the last local copy only as fallback.
+    try{
+      const local=JSON.parse(localStorage.getItem("cjpTasks")||"null");
+      if(Array.isArray(local)){ tasks=local; render(); }
+    }catch(x){}
+    if(s)s.textContent="⚠️ Não foi possível consultar os dados publicados";
   }
 }
-
-function publicarAtualizacoes(){
-  if(!save()) return;
-  const blob=new Blob([JSON.stringify(tasks,null,2)],{type:"application/json;charset=utf-8"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url; a.download="dados.json"; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-  const s=document.getElementById("syncStatus");
-  if(s) s.textContent="🚀 dados.json gerado — agora substitua o arquivo no GitHub e faça Commit changes.";
-  alert("ATUALIZAÇÕES PREPARADAS!\n\n1. O dados.json foi baixado.\n2. Abra o GitHub.\n3. Substitua o dados.json atual.\n4. Clique em Commit changes.\n\nDepois disso, todos verão as alterações publicadas.");
-}
-
 function exportJSON(){
   save();
   const blob=new Blob([JSON.stringify(tasks,null,2)],{type:'application/json'});
